@@ -1,0 +1,28 @@
+@if (items().length) {
+  <section class="faq" aria-labelledby="faq-heading">
+    <h2 id="faq-heading">{{ heading() }}</h2>
+    <div class="faq__list">
+      @for (item of items(); track item.question; let i = $index) {
+        <div class="faq__item" [class.is-open]="openIndex() === i">
+          <button
+            type="button"
+            class="faq__question"
+            [attr.aria-expanded]="openIndex() === i"
+            [attr.aria-controls]="'faq-panel-' + i"
+            (click)="toggle(i)"
+          >
+            <span>{{ item.question }}</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true" class="faq__chevron">
+              <path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+          @if (openIndex() === i) {
+            <div class="faq__answer" [id]="'faq-panel-' + i">
+              <p>{{ item.answer }}</p>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+}

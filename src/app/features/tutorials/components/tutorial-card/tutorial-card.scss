@@ -1,0 +1,81 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.tutorial-card__link {
+  display: block;
+  color: inherit;
+  flex: 1;
+}
+
+.tutorial-card__link:hover {
+  text-decoration: none;
+}
+
+.tutorial-card__image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  margin: -20px -20px 16px;
+  background: linear-gradient(135deg, var(--color-primary-soft), var(--color-bg-secondary));
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: 0.875rem;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.tutorial-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.tutorial-card__body h3 {
+  font-size: 1.0625rem;
+  margin-bottom: 6px;
+}
+
+.tutorial-card__body p {
+  font-size: 0.875rem;
+  margin-bottom: 14px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tutorial-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.tutorial-card__author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+.tutorial-card__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-surface-hover);
+  font-size: 0.6875rem;
+  font-weight: 700;
+}

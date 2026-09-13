@@ -1,0 +1,79 @@
+<header class="header">
+  <div class="header__bar container">
+    <a routerLink="/" class="header__logo" aria-label="TechAI Tools home">
+      <span class="header__logo-mark">TA</span>
+      <span class="header__logo-text">TechAI Tools</span>
+    </a>
+
+    <nav class="header__nav" aria-label="Primary">
+      @for (link of navLinks; track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: link.path === '/' }">{{ link.label }}</a>
+      }
+    </nav>
+
+    <div class="header__actions">
+      <div class="header__search-desktop">
+        <app-search-box placeholder="Search..." />
+      </div>
+
+      <button
+        type="button"
+        class="header__icon-btn header__search-mobile-btn"
+        aria-label="Toggle search"
+        (click)="toggleMobileSearch()"
+      >
+        <svg viewBox="0 0 20 20" aria-hidden="true">
+          <circle cx="9" cy="9" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+          <line x1="14" y1="14" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      <app-dropdown
+        label="Theme"
+        [options]="themeOptions"
+        [selectedValue]="theme.preference()"
+        (valueChange)="onThemeChange($event)"
+      />
+
+      <a routerLink="/favorites" class="header__icon-btn" aria-label="View favorites">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 20.7l-1.5-1.4C5.4 14.6 2 11.5 2 7.9 2 5.1 4.2 3 6.9 3c1.6 0 3.1.8 4.1 2 .9-1.2 2.5-2 4.1-2 2.7 0 4.9 2.1 4.9 4.9 0 3.6-3.4 6.7-8.5 11.4L12 20.7z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          />
+        </svg>
+      </a>
+
+      <button
+        type="button"
+        class="header__icon-btn header__menu-btn"
+        aria-label="Toggle menu"
+        [attr.aria-expanded]="mobileMenuOpen()"
+        (click)="toggleMobileMenu()"
+      >
+        @if (mobileMenuOpen()) {
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 4l12 12M16 4L4 16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        } @else {
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (mobileSearchOpen()) {
+    <div class="header__search-mobile container">
+      <app-search-box />
+    </div>
+  }
+
+  @if (mobileMenuOpen()) {
+    <nav class="header__mobile-nav" aria-label="Mobile">
+      @for (link of navLinks; track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="is-active" (click)="closeMobileMenu()">{{ link.label }}</a>
+      }
+      <a routerLink="/favorites" (click)="closeMobileMenu()">Favorites</a>
+    </nav>
+  }
+</header>

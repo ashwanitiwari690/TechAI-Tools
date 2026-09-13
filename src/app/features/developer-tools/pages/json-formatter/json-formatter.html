@@ -1,0 +1,34 @@
+<app-tool-layout
+  title="JSON Formatter"
+  description="Paste minified or messy JSON and instantly get a clean, properly indented version."
+  whatIsIt="The JSON Formatter takes any valid JSON text and reformats it with consistent indentation and line breaks, making it far easier to read and review."
+  howItWorks="Your JSON is parsed entirely in your browser using the standard JSON.parse method, then re-serialized with your chosen indentation. Nothing is uploaded or sent to a server."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-controls">
+    <label>
+      Indent width
+      <select (change)="setIndent($any($event.target).value)">
+        <option value="2">2 spaces</option>
+        <option value="4">4 spaces</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="tool-grid-2">
+    <app-tool-input
+      label="Input JSON"
+      placeholder="Paste your JSON here..."
+      [(value)]="input"
+      [hasExample]="true"
+      (loadExample)="loadExample()"
+    />
+    <app-tool-output label="Formatted JSON" [value]="result().output" [error]="result().error" downloadFilename="formatted.json" />
+  </div>
+</app-tool-layout>

@@ -1,0 +1,70 @@
+@if (consent.bannerVisible()) {
+  <div class="cookie-banner" role="dialog" aria-label="Cookie consent">
+    <p>
+      We use cookies to run this site and, with your consent, to understand usage and support future
+      advertising. See our <a routerLink="/cookie-policy">Cookie Policy</a> for details.
+    </p>
+    <div class="cookie-banner__actions">
+      <button type="button" class="cookie-banner__link" (click)="openPreferences()">Manage preferences</button>
+      <button type="button" class="cookie-banner__btn cookie-banner__btn--outline" (click)="consent.rejectNonEssential()">
+        Reject non-essential
+      </button>
+      <button type="button" class="cookie-banner__btn cookie-banner__btn--primary" (click)="consent.acceptAll()">
+        Accept all
+      </button>
+    </div>
+  </div>
+}
+
+@if (preferencesOpen()) {
+  <app-modal heading="Cookie Preferences" (closed)="closePreferences()">
+    <p class="cookie-modal__intro">
+      Choose which optional cookie categories to allow. Necessary cookies are always active because the site
+      cannot function properly without them.
+    </p>
+
+    <div class="cookie-modal__row">
+      <div>
+        <strong>Necessary</strong>
+        <p>Required for core functionality such as theme preference and saved favorites.</p>
+      </div>
+      <input type="checkbox" checked disabled aria-label="Necessary cookies (always on)" />
+    </div>
+
+    <div class="cookie-modal__row">
+      <div>
+        <strong>Analytics</strong>
+        <p>Helps us understand which tools and tutorials are most useful, in aggregate.</p>
+      </div>
+      <input
+        type="checkbox"
+        [checked]="draftAnalytics()"
+        (change)="draftAnalytics.set(!draftAnalytics())"
+        aria-label="Analytics cookies"
+      />
+    </div>
+
+    <div class="cookie-modal__row">
+      <div>
+        <strong>Advertising</strong>
+        <p>Used to support future ad personalization once monetization is enabled.</p>
+      </div>
+      <input
+        type="checkbox"
+        [checked]="draftAdvertising()"
+        (change)="draftAdvertising.set(!draftAdvertising())"
+        aria-label="Advertising cookies"
+      />
+    </div>
+
+    <p class="cookie-modal__note">
+      This banner stores your choice in your browser only. It is provided as a starting point and should be
+      reviewed against the specific privacy laws (e.g. GDPR, CCPA) that apply to your audience before launch.
+    </p>
+
+    <div class="cookie-modal__actions">
+      <button type="button" class="cookie-banner__btn cookie-banner__btn--outline" (click)="closePreferences()">Cancel</button>
+      <button type="button" class="cookie-banner__btn cookie-banner__btn--primary" (click)="savePreferences()">Save preferences</button>
+    </div>
+  </app-modal>
+}

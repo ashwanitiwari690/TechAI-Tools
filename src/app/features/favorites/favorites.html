@@ -1,0 +1,57 @@
+<div class="container page">
+  <header class="page__header">
+    <h1>Your Favorites</h1>
+    <p>AI tools, software, tutorials and guides you've saved — stored locally in this browser.</p>
+  </header>
+
+  @if (isEmpty()) {
+    <app-empty-state
+      title="No favorites yet"
+      message="Tap the heart icon on any AI tool, software, tutorial or guide to save it here for quick access."
+    />
+  } @else {
+    @if (favoriteAiTools().length) {
+      <section class="detail-section">
+        <h2>AI Tools</h2>
+        <div class="grid grid--3">
+          @for (tool of favoriteAiTools(); track tool.slug) {
+            <app-ai-tool-card [tool]="tool" />
+          }
+        </div>
+      </section>
+    }
+
+    @if (favoriteSoftware().length) {
+      <section class="detail-section">
+        <h2>Software</h2>
+        <div class="grid grid--3">
+          @for (item of favoriteSoftware(); track item.slug) {
+            <app-software-card [item]="item" />
+          }
+        </div>
+      </section>
+    }
+
+    @if (favoriteTutorials().length) {
+      <section class="detail-section">
+        <h2>Tutorials</h2>
+        <div class="grid grid--3">
+          @for (tutorial of favoriteTutorials(); track tutorial.slug) {
+            <app-tutorial-card [tutorial]="tutorial" />
+          }
+        </div>
+      </section>
+    }
+
+    @if (favoriteGuides().length) {
+      <section class="detail-section">
+        <h2>Guides</h2>
+        <div class="grid grid--3">
+          @for (guide of favoriteGuides(); track guide.slug) {
+            <app-guide-card [guide]="guide" />
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

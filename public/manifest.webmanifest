@@ -1,0 +1,16 @@
+{
+  "name": "TechAI Tools",
+  "short_name": "TechAI Tools",
+  "description": "Discover AI tools, developer utilities, software and tutorials.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}

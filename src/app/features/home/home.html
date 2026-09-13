@@ -1,0 +1,158 @@
+<section class="hero">
+  <div class="container hero__inner">
+    <span class="section-eyebrow">AI &amp; Software Tools + Tutorials</span>
+    <h1>Discover Powerful AI &amp; Software Tools</h1>
+    <p class="hero__sub">
+      Find the right AI tools, developer utilities and software for your work — plus practical, in-depth tutorials
+      that actually explain how to use them.
+    </p>
+
+    <div class="hero__search">
+      <app-search-box placeholder="Search tools, tutorials and guides..." size="lg" />
+    </div>
+
+    <div class="hero__actions">
+      <app-button routerLink="/ai-tools" variant="primary" size="lg">Explore AI Tools</app-button>
+      <app-button routerLink="/developer-tools" variant="outline" size="lg">Explore Developer Tools</app-button>
+    </div>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="section-head">
+    <div>
+      <span class="section-eyebrow">Featured</span>
+      <h2>Featured AI Tools</h2>
+      <p class="section-sub">Widely used AI tools across writing, coding, image generation and more.</p>
+    </div>
+    <a routerLink="/ai-tools" class="section-head__link">View all AI tools &rarr;</a>
+  </div>
+
+  <div class="grid grid--3">
+    @for (tool of featuredTools; track tool.slug) {
+      <app-ai-tool-card [tool]="tool" />
+    }
+  </div>
+</section>
+
+<section class="section section--muted">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-eyebrow">Free &amp; Instant</span>
+        <h2>Popular Developer Tools</h2>
+        <p class="section-sub">Browser-based utilities that run instantly — no installation, no sign-up.</p>
+      </div>
+      <a routerLink="/developer-tools" class="section-head__link">View all developer tools &rarr;</a>
+    </div>
+
+    <div class="grid grid--4">
+      @for (tool of popularDeveloperTools; track tool.slug) {
+        <app-card [interactive]="true">
+          <a [routerLink]="['/developer-tools', tool.slug]" class="tool-tile">
+            <span class="tool-tile__icon" aria-hidden="true">{{ tool.icon }}</span>
+            <h3>{{ tool.name }}</h3>
+            <p>{{ tool.shortDescription }}</p>
+          </a>
+        </app-card>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="section-head">
+    <div>
+      <span class="section-eyebrow">Learn</span>
+      <h2>Latest Tutorials</h2>
+      <p class="section-sub">Practical, in-depth guides on AI tools, Angular, JavaScript and more.</p>
+    </div>
+    <a routerLink="/tutorials" class="section-head__link">View all tutorials &rarr;</a>
+  </div>
+
+  <div class="grid grid--3">
+    @for (tutorial of latestTutorials; track tutorial.slug) {
+      <app-tutorial-card [tutorial]="tutorial" />
+    }
+  </div>
+</section>
+
+<section class="section section--muted">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <span class="section-eyebrow">Browse</span>
+        <h2>Popular Categories</h2>
+      </div>
+    </div>
+
+    <div class="category-grid">
+      @for (category of categories; track category.label) {
+        <a [routerLink]="category.routerLink" class="category-tile">{{ category.label }}</a>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section container">
+  <div class="section-head">
+    <div>
+      <span class="section-eyebrow">Why TechAI Tools</span>
+      <h2>Why use our platform</h2>
+    </div>
+  </div>
+
+  <div class="grid grid--4 why-grid">
+    <app-card>
+      <h3>Curated, not exhaustive</h3>
+      <p>Every listing is chosen for genuine usefulness, not just to pad out a directory.</p>
+    </app-card>
+    <app-card>
+      <h3>Practical tutorials</h3>
+      <p>Step-by-step guides that explain how and why, not just surface-level summaries.</p>
+    </app-card>
+    <app-card>
+      <h3>Real developer utilities</h3>
+      <p>Browser-based tools that actually work — JSON formatting, JWT decoding, regex testing and more.</p>
+    </app-card>
+    <app-card>
+      <h3>Clear, honest guides</h3>
+      <p>Pros, cons and limitations are called out directly, not hidden behind marketing language.</p>
+    </app-card>
+  </div>
+</section>
+
+<section class="section container">
+  <app-card class="newsletter-card">
+    <div class="newsletter">
+      <div class="newsletter__copy">
+        <h2>Stay in the loop</h2>
+        <p>Get occasional updates on new AI tools, developer utilities and tutorials. No spam, unsubscribe anytime.</p>
+      </div>
+
+      @if (newsletterSubmitted()) {
+        <p class="newsletter__success" role="status">Thanks for subscribing! Please check your inbox to confirm.</p>
+      } @else {
+        <form class="newsletter__form" [formGroup]="newsletterForm" (ngSubmit)="submitNewsletter()">
+          <label for="newsletter-email" class="visually-hidden">Email address</label>
+          <input
+            id="newsletter-email"
+            type="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            [attr.aria-invalid]="newsletterForm.controls.email.invalid && newsletterForm.controls.email.touched"
+          />
+          <app-button type="submit" variant="primary">Subscribe</app-button>
+        </form>
+        @if (newsletterForm.controls.email.invalid && newsletterForm.controls.email.touched) {
+          <p class="newsletter__error">Please enter a valid email address.</p>
+        }
+        <p class="newsletter__note">This form is frontend-only for now — connect it to an email service to go live.</p>
+      }
+    </div>
+  </app-card>
+</section>
+
+<section class="container">
+  <app-ad-banner />
+</section>

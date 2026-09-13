@@ -1,0 +1,80 @@
+@if (item(); as item) {
+  <div class="container detail-page">
+    <app-breadcrumb [items]="breadcrumb()" />
+
+    <div class="detail-page__layout">
+      <div class="detail-page__main">
+        <header class="detail-hero">
+          <span class="detail-hero__logo" aria-hidden="true">{{ item.logoInitials }}</span>
+          <div class="detail-hero__info">
+            <h1>{{ item.name }}</h1>
+            <app-rating [value]="item.rating" [reviewCount]="item.reviewCount" />
+            <div class="detail-hero__badges">
+              <app-badge tone="primary">{{ item.category }}</app-badge>
+              <app-badge>{{ item.pricing }}</app-badge>
+              @for (os of item.operatingSystems; track os) {
+                <app-badge>{{ os }}</app-badge>
+              }
+            </div>
+          </div>
+          <div class="detail-hero__actions">
+            <app-button [href]="item.websiteUrl" variant="primary">Visit website</app-button>
+            <app-favorite-button type="software" [slug]="item.slug" [name]="item.name" />
+          </div>
+        </header>
+
+        <section class="detail-section">
+          <h2>Overview</h2>
+          <p>{{ item.description }}</p>
+        </section>
+
+        <section class="detail-section">
+          <h2>Key features</h2>
+          <ul>
+            @for (feature of item.features; track feature) {
+              <li>{{ feature }}</li>
+            }
+          </ul>
+        </section>
+
+        <app-ad-in-article />
+
+        <section class="detail-section detail-section--split">
+          <div>
+            <h2>Pros</h2>
+            <ul class="detail-list detail-list--pros">
+              @for (pro of item.pros; track pro) {
+                <li>{{ pro }}</li>
+              }
+            </ul>
+          </div>
+          <div>
+            <h2>Cons</h2>
+            <ul class="detail-list detail-list--cons">
+              @for (con of item.cons; track con) {
+                <li>{{ con }}</li>
+              }
+            </ul>
+          </div>
+        </section>
+
+        <app-faq-accordion [items]="item.faq" />
+
+        @if (related().length) {
+          <section class="detail-section">
+            <h2>Related software</h2>
+            <div class="grid grid--3">
+              @for (relatedItem of related(); track relatedItem.slug) {
+                <app-software-card [item]="relatedItem" />
+              }
+            </div>
+          </section>
+        }
+      </div>
+
+      <aside class="detail-page__sidebar">
+        <app-ad-rectangle />
+      </aside>
+    </div>
+  </div>
+}

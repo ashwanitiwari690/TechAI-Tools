@@ -1,0 +1,38 @@
+<div class="container page">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <header class="page__header">
+    <h1>Software Directory</h1>
+    <p>Discover software across development, design, productivity, business, security, video, audio and education.</p>
+  </header>
+
+  <div class="page__filters">
+    <input
+      type="search"
+      class="page__search"
+      placeholder="Search software..."
+      [value]="searchTerm()"
+      (input)="updateSearch($any($event.target).value)"
+      aria-label="Search software"
+    />
+    <div class="page__categories">
+      @for (category of categories; track category) {
+        <button type="button" [class.is-active]="activeCategory() === category" (click)="updateCategory(category)">{{ category }}</button>
+      }
+    </div>
+  </div>
+
+  @if (pagedItems().length) {
+    <div class="grid grid--3">
+      @for (item of pagedItems(); track item.slug) {
+        <app-software-card [item]="item" />
+      }
+    </div>
+
+    <app-pagination [currentPage]="page()" [totalPages]="totalPages()" (pageChange)="page.set($event)" />
+  } @else {
+    <app-empty-state title="No software found" message="Try a different search term or category." />
+  }
+
+  <app-ad-banner />
+</div>

@@ -1,0 +1,31 @@
+<app-tool-layout
+  title="Base64 Encoder / Decoder"
+  description="Encode plain text to Base64, or decode Base64 back to readable text — instantly, in your browser."
+  whatIsIt="Base64 is a text encoding scheme that represents binary or text data using 64 printable characters. This tool converts freely between plain text and its Base64 representation."
+  howItWorks="Encoding uses the browser's built-in btoa function (with Unicode-safe handling); decoding reverses the process with atob, all on your device."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-controls">
+    <div class="segmented">
+      <button type="button" [class.is-active]="mode() === 'encode'" (click)="setMode('encode')">Encode</button>
+      <button type="button" [class.is-active]="mode() === 'decode'" (click)="setMode('decode')">Decode</button>
+    </div>
+  </div>
+
+  <div class="tool-grid-2">
+    <app-tool-input
+      [label]="mode() === 'encode' ? 'Plain text' : 'Base64 text'"
+      placeholder="Type or paste text here..."
+      [(value)]="input"
+      [hasExample]="true"
+      (loadExample)="loadExample()"
+    />
+    <app-tool-output [label]="mode() === 'encode' ? 'Base64 output' : 'Decoded text'" [value]="result().output" [error]="result().error" />
+  </div>
+</app-tool-layout>

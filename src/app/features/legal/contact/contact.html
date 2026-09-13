@@ -1,0 +1,52 @@
+<div class="container legal-page">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <header class="article__header">
+    <h1>Contact Us</h1>
+    <p class="article__description">Questions, suggestions, or spotted something that needs fixing? Send us a message below.</p>
+  </header>
+
+  @if (submitted()) {
+    <div class="contact-success" role="status">
+      <h2>Message received</h2>
+      <p>Thanks for reaching out! This form is currently frontend-only, so submissions aren't sent anywhere yet — connecting it to an email service or backend endpoint is a straightforward next step.</p>
+    </div>
+  } @else {
+    <form class="contact-form" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="contact-form__field">
+        <label for="contact-name">Name</label>
+        <input id="contact-name" type="text" formControlName="name" [attr.aria-invalid]="field('name')" />
+        @if (field('name')) {
+          <span class="contact-form__error">Please enter your name.</span>
+        }
+      </div>
+
+      <div class="contact-form__field">
+        <label for="contact-email">Email</label>
+        <input id="contact-email" type="email" formControlName="email" [attr.aria-invalid]="field('email')" />
+        @if (field('email')) {
+          <span class="contact-form__error">Please enter a valid email address.</span>
+        }
+      </div>
+
+      <div class="contact-form__field">
+        <label for="contact-subject">Subject</label>
+        <input id="contact-subject" type="text" formControlName="subject" [attr.aria-invalid]="field('subject')" />
+        @if (field('subject')) {
+          <span class="contact-form__error">Please enter a subject.</span>
+        }
+      </div>
+
+      <div class="contact-form__field">
+        <label for="contact-message">Message</label>
+        <textarea id="contact-message" rows="6" formControlName="message" [attr.aria-invalid]="field('message')"></textarea>
+        @if (field('message')) {
+          <span class="contact-form__error">Please enter a message of at least 10 characters.</span>
+        }
+      </div>
+
+      <app-button type="submit" variant="primary">Send message</app-button>
+      <p class="contact-form__note">This form is frontend-only for now and requires backend/email integration to actually deliver messages.</p>
+    </form>
+  }
+</div>

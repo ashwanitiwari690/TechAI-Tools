@@ -1,0 +1,18 @@
+<app-tool-layout
+  title="JavaScript Formatter"
+  description="Beautify minified or compact JavaScript into a more readable, indented form."
+  whatIsIt="This tool reformats JavaScript code so that blocks and statements are indented consistently, making unfamiliar or minified code easier to read."
+  howItWorks="It scans your code character by character, correctly skipping over strings, template literals and comments, and indents based on brace and statement structure — entirely in your browser."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-grid-2">
+    <app-tool-input label="Input JavaScript" placeholder="Paste JavaScript here..." [(value)]="input" [hasExample]="true" (loadExample)="loadExample()" />
+    <app-tool-output label="Formatted JavaScript" [value]="output()" downloadFilename="formatted.js" />
+  </div>
+</app-tool-layout>

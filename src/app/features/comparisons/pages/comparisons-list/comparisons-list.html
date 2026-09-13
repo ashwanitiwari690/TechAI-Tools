@@ -1,0 +1,16 @@
+<div class="container page">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <header class="page__header">
+    <h1>Comparisons</h1>
+    <p>Clear, side-by-side comparisons of popular AI and developer tools — features, pricing, pros, cons and a straightforward verdict.</p>
+  </header>
+
+  <div class="grid grid--3">
+    @for (comparison of comparisons; track comparison.slug) {
+      <app-comparison-card [comparison]="comparison" />
+    }
+  </div>
+
+  <app-ad-banner />
+</div>

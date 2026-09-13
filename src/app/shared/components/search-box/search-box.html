@@ -1,0 +1,13 @@
+<form class="search-box search-box--{{ size() }}" role="search" (ngSubmit)="submit()">
+  <svg viewBox="0 0 20 20" aria-hidden="true" class="search-box__icon">
+    <circle cx="9" cy="9" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8" />
+    <line x1="14" y1="14" x2="18" y2="18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+  </svg>
+  <input
+    type="search"
+    [formControl]="query"
+    [placeholder]="placeholder()"
+    aria-label="Search"
+  />
+  <button type="submit" class="search-box__submit">Search</button>
+</form>

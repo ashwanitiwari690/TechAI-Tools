@@ -1,0 +1,114 @@
+<div class="tool-page container">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <header class="tool-page__header">
+    <h1>{{ title() }}</h1>
+    <p>{{ description() }}</p>
+  </header>
+
+  <div class="tool-page__layout">
+    <div class="tool-page__main">
+      <section class="tool-page__workspace">
+        <ng-content />
+      </section>
+
+      @if (whatIsIt() || howItWorks()) {
+        <section class="tool-page__info">
+          @if (whatIsIt()) {
+            <h2>What is this tool?</h2>
+            <p>{{ whatIsIt() }}</p>
+          }
+          @if (howItWorks()) {
+            <h2>How does it work?</h2>
+            <p>{{ howItWorks() }}</p>
+          }
+        </section>
+      }
+
+      @if (howToUse().length) {
+        <section class="tool-page__info">
+          <h2>How to use it</h2>
+          <ol>
+            @for (step of howToUse(); track step) {
+              <li>{{ step }}</li>
+            }
+          </ol>
+        </section>
+      }
+
+      @if (example()) {
+        <section class="tool-page__info">
+          <h2>Example</h2>
+          <div class="tool-page__example">
+            <div>
+              <span class="tool-page__example-label">Input</span>
+              <pre>{{ example()!.input }}</pre>
+            </div>
+            <div>
+              <span class="tool-page__example-label">Output</span>
+              <pre>{{ example()!.output }}</pre>
+            </div>
+          </div>
+        </section>
+      }
+
+      <app-ad-in-article />
+
+      @if (useCases().length || benefits().length || limitations().length) {
+        <section class="tool-page__info tool-page__triple">
+          @if (useCases().length) {
+            <div>
+              <h2>Common use cases</h2>
+              <ul>
+                @for (item of useCases(); track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (benefits().length) {
+            <div>
+              <h2>Benefits</h2>
+              <ul>
+                @for (item of benefits(); track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
+          }
+          @if (limitations().length) {
+            <div>
+              <h2>Limitations</h2>
+              <ul>
+                @for (item of limitations(); track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </div>
+          }
+        </section>
+      }
+
+      @if (faq().length) {
+        <section class="tool-page__info">
+          <app-faq-accordion [items]="faq()" />
+        </section>
+      }
+
+      @if (relatedTools().length) {
+        <section class="tool-page__info">
+          <h2>Related developer tools</h2>
+          <div class="tool-page__related">
+            @for (tool of relatedTools(); track tool.slug) {
+              <a [routerLink]="['/developer-tools', tool.slug]">{{ tool.name }}</a>
+            }
+          </div>
+        </section>
+      }
+    </div>
+
+    <aside class="tool-page__sidebar">
+      <app-ad-rectangle />
+    </aside>
+  </div>
+</div>

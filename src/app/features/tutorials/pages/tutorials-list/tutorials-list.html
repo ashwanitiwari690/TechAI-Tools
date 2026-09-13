@@ -1,0 +1,43 @@
+<div class="container page">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <header class="page__header">
+    <h1>Tutorials</h1>
+    <p>Practical, in-depth guides on AI tools, Angular, JavaScript, TypeScript, Node.js and general web development.</p>
+  </header>
+
+  <div class="page__filters">
+    <input
+      type="search"
+      class="page__search"
+      placeholder="Search tutorials..."
+      [value]="searchTerm()"
+      (input)="updateSearch($any($event.target).value)"
+      aria-label="Search tutorials"
+    />
+    <div class="page__categories">
+      @for (category of categories; track category) {
+        <button type="button" [class.is-active]="activeCategory() === category" (click)="updateCategory(category)">{{ category }}</button>
+      }
+    </div>
+    <div class="page__filter-group">
+      @for (difficulty of difficulties; track difficulty) {
+        <button type="button" [class.is-active]="activeDifficulty() === difficulty" (click)="updateDifficulty(difficulty)">{{ difficulty }}</button>
+      }
+    </div>
+  </div>
+
+  @if (pagedTutorials().length) {
+    <div class="grid grid--3">
+      @for (tutorial of pagedTutorials(); track tutorial.slug) {
+        <app-tutorial-card [tutorial]="tutorial" />
+      }
+    </div>
+
+    <app-pagination [currentPage]="page()" [totalPages]="totalPages()" (pageChange)="page.set($event)" />
+  } @else {
+    <app-empty-state title="No tutorials found" message="Try a different search term, category or difficulty." />
+  }
+
+  <app-ad-banner />
+</div>

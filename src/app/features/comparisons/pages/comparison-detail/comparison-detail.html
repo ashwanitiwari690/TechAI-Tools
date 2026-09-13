@@ -1,0 +1,118 @@
+@if (comparison(); as comparison) {
+  <div class="container detail-page">
+    <app-breadcrumb [items]="breadcrumb()" />
+
+    <div class="detail-page__layout">
+      <div class="detail-page__main">
+        <header class="article__header">
+          <h1>{{ comparison.title }}</h1>
+          <p class="article__description">{{ comparison.description }}</p>
+          <div class="article__meta">
+            <span>Published <time [attr.datetime]="comparison.publishedDate">{{ comparison.publishedDate }}</time></span>
+          </div>
+        </header>
+
+        <div class="versus-panel">
+          <div class="versus-panel__side">
+            <span class="versus-panel__logo">{{ comparison.itemA.logoInitials }}</span>
+            <h2>{{ comparison.itemA.name }}</h2>
+            <app-rating [value]="comparison.itemA.rating" [showValue]="true" />
+            <p class="versus-panel__pricing">{{ comparison.itemA.pricing }}</p>
+            @if (comparison.itemA.toolSlug) {
+              <a [routerLink]="['/ai-tools', comparison.itemA.toolSlug]" class="versus-panel__link">View full profile</a>
+            }
+          </div>
+          <span class="versus-panel__vs">VS</span>
+          <div class="versus-panel__side">
+            <span class="versus-panel__logo">{{ comparison.itemB.logoInitials }}</span>
+            <h2>{{ comparison.itemB.name }}</h2>
+            <app-rating [value]="comparison.itemB.rating" [showValue]="true" />
+            <p class="versus-panel__pricing">{{ comparison.itemB.pricing }}</p>
+            @if (comparison.itemB.toolSlug) {
+              <a [routerLink]="['/ai-tools', comparison.itemB.toolSlug]" class="versus-panel__link">View full profile</a>
+            }
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <h2>Feature comparison</h2>
+          <div class="article__table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Feature</th>
+                  <th>{{ comparison.itemA.name }}</th>
+                  <th>{{ comparison.itemB.name }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of comparison.featureRows; track row.feature) {
+                  <tr>
+                    <td>{{ row.feature }}</td>
+                    <td>{{ row.itemA }}</td>
+                    <td>{{ row.itemB }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <app-ad-in-article />
+
+        <section class="detail-section detail-section--split">
+          <div>
+            <h2>{{ comparison.itemA.name }}: Pros &amp; Cons</h2>
+            <ul class="detail-list detail-list--pros">
+              @for (pro of comparison.itemA.pros; track pro) {
+                <li>{{ pro }}</li>
+              }
+            </ul>
+            <ul class="detail-list detail-list--cons">
+              @for (con of comparison.itemA.cons; track con) {
+                <li>{{ con }}</li>
+              }
+            </ul>
+            <p class="versus-panel__best-for"><strong>Best for:</strong> {{ comparison.itemA.bestFor }}</p>
+          </div>
+          <div>
+            <h2>{{ comparison.itemB.name }}: Pros &amp; Cons</h2>
+            <ul class="detail-list detail-list--pros">
+              @for (pro of comparison.itemB.pros; track pro) {
+                <li>{{ pro }}</li>
+              }
+            </ul>
+            <ul class="detail-list detail-list--cons">
+              @for (con of comparison.itemB.cons; track con) {
+                <li>{{ con }}</li>
+              }
+            </ul>
+            <p class="versus-panel__best-for"><strong>Best for:</strong> {{ comparison.itemB.bestFor }}</p>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h2>Verdict</h2>
+          <p>{{ comparison.verdict }}</p>
+        </section>
+
+        <app-faq-accordion [items]="comparison.faq" />
+
+        @if (others().length) {
+          <section class="detail-section">
+            <h2>More comparisons</h2>
+            <div class="grid grid--3">
+              @for (item of others(); track item.slug) {
+                <app-comparison-card [comparison]="item" />
+              }
+            </div>
+          </section>
+        }
+      </div>
+
+      <aside class="detail-page__sidebar">
+        <app-ad-rectangle />
+      </aside>
+    </div>
+  </div>
+}

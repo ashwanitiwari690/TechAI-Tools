@@ -1,0 +1,18 @@
+<app-tool-layout
+  title="HTML Formatter"
+  description="Beautify minified or messy HTML markup into a clean, properly indented structure."
+  whatIsIt="This tool reformats HTML markup so that nested elements are indented consistently, making the structure of a page easy to read at a glance."
+  howItWorks="It tokenizes the markup into tags and text, then reindents based on opening and closing tags — entirely in your browser."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-grid-2">
+    <app-tool-input label="Input HTML" placeholder="Paste HTML here..." [(value)]="input" [hasExample]="true" (loadExample)="loadExample()" />
+    <app-tool-output label="Formatted HTML" [value]="output()" downloadFilename="formatted.html" />
+  </div>
+</app-tool-layout>

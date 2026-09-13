@@ -1,0 +1,56 @@
+<div class="container legal-page">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <article class="article">
+    <header class="article__header">
+      <h1>Privacy Policy</h1>
+      <p class="article__description">Last updated: {{ lastUpdated }}</p>
+    </header>
+
+    <div class="article__body">
+      <p>
+        <strong>This is a template privacy policy for a frontend-only demonstration project, not final legal
+        copy.</strong> Before this site is used with real users or real data collection, this page should be
+        reviewed and finalized by someone qualified to assess compliance with the specific laws that apply to your
+        audience (for example GDPR in the EU/UK, or CCPA/CPRA in California).
+      </p>
+
+      <h2>What data this site currently stores</h2>
+      <p>
+        This application does not have a backend and does not operate user accounts. The following pieces of data
+        are stored only in your own browser's local storage, and are never transmitted to us or any third party by
+        this app:
+      </p>
+      <ul>
+        <li>Your light/dark/system theme preference</li>
+        <li>Your saved favorites (AI tools, software, tutorials, guides)</li>
+        <li>Your cookie consent choice and preferences</li>
+      </ul>
+
+      <h2>Third-party services</h2>
+      <p>
+        This site currently loads Google Fonts for typography. Once Google AdSense or analytics tools are added in
+        the future (see the "Advertising" section below), those services will set their own cookies and collect data
+        according to their own privacy policies, and this page will need to be updated to disclose that in detail.
+      </p>
+
+      <h2>Advertising</h2>
+      <p>
+        This site is designed to be monetized with Google AdSense in the future. Advertising placeholder components
+        are visible throughout the site, but no real advertising code has been added yet. Once AdSense (or another ad
+        network) is integrated, this policy must be updated to describe the data that network collects, including any
+        use of cookies for personalized advertising, and to provide any required consent and opt-out mechanisms.
+      </p>
+
+      <h2>Cookie consent</h2>
+      <p>
+        A cookie consent banner lets you accept all, reject non-essential, or customize preferences for analytics and
+        advertising cookies. See our <a routerLink="/cookie-policy">Cookie Policy</a> for more detail. This implementation
+        is a starting point and should be reviewed against applicable regional requirements before launch.
+      </p>
+
+      <h2>Contact</h2>
+      <p>Questions about this policy can be sent via our <a routerLink="/contact">contact page</a>.</p>
+    </div>
+  </article>
+</div>

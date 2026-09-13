@@ -1,0 +1,111 @@
+@if (tool(); as tool) {
+  <div class="container detail-page">
+    <app-breadcrumb [items]="breadcrumb()" />
+
+    <div class="detail-page__layout">
+      <div class="detail-page__main">
+        <header class="detail-hero">
+          <span class="detail-hero__logo" aria-hidden="true">{{ tool.logoInitials }}</span>
+          <div class="detail-hero__info">
+            <h1>{{ tool.name }}</h1>
+            <app-rating [value]="tool.rating" [reviewCount]="tool.reviewCount" />
+            <div class="detail-hero__badges">
+              <app-badge tone="primary">{{ tool.category }}</app-badge>
+              <app-badge>{{ tool.pricing }}</app-badge>
+              @for (tag of tool.tags; track tag) {
+                <app-badge>{{ tag }}</app-badge>
+              }
+            </div>
+          </div>
+          <div class="detail-hero__actions">
+            <app-button [href]="tool.websiteUrl" variant="primary">Visit website</app-button>
+            <app-favorite-button type="ai-tool" [slug]="tool.slug" [name]="tool.name" />
+          </div>
+        </header>
+
+        <section class="detail-section">
+          <h2>Overview</h2>
+          <p>{{ tool.description }}</p>
+        </section>
+
+        <section class="detail-section">
+          <h2>Key features</h2>
+          <ul>
+            @for (feature of tool.features; track feature) {
+              <li>{{ feature }}</li>
+            }
+          </ul>
+        </section>
+
+        <app-ad-in-article />
+
+        <section class="detail-section detail-section--split">
+          <div>
+            <h2>Pros</h2>
+            <ul class="detail-list detail-list--pros">
+              @for (pro of tool.pros; track pro) {
+                <li>{{ pro }}</li>
+              }
+            </ul>
+          </div>
+          <div>
+            <h2>Cons</h2>
+            <ul class="detail-list detail-list--cons">
+              @for (con of tool.cons; track con) {
+                <li>{{ con }}</li>
+              }
+            </ul>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h2>Best for</h2>
+          <div class="detail-page__related">
+            @for (item of tool.bestFor; track item) {
+              <app-badge tone="success">{{ item }}</app-badge>
+            }
+          </div>
+        </section>
+
+        @if (alternativeCards().length) {
+          <section class="detail-section">
+            <h2>Alternatives</h2>
+            <div class="detail-page__related">
+              @for (alt of alternativeCards(); track alt.slug) {
+                <a [routerLink]="['/ai-tools', alt.slug]">{{ alt.name }}</a>
+              }
+            </div>
+          </section>
+        }
+
+        @if (tool.relatedTutorialSlugs.length) {
+          <section class="detail-section">
+            <h2>Related tutorials</h2>
+            <div class="detail-page__related">
+              @for (slug of tool.relatedTutorialSlugs; track slug) {
+                <a [routerLink]="['/tutorials', slug]">{{ relatedTutorialTitle(slug) }}</a>
+              }
+            </div>
+          </section>
+        }
+
+        <app-faq-accordion [items]="tool.faq" />
+
+        @if (related().length) {
+          <section class="detail-section">
+            <h2>Related AI tools</h2>
+            <div class="grid grid--3">
+              @for (relatedTool of related(); track relatedTool.slug) {
+                <app-ai-tool-card [tool]="relatedTool" />
+              }
+            </div>
+          </section>
+        }
+      </div>
+
+      <aside class="detail-page__sidebar">
+        <app-ad-rectangle />
+      </aside>
+    </div>
+  </div>
+}

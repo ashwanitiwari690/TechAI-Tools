@@ -1,0 +1,17 @@
+<div class="modal-backdrop" (click)="close()">
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'modal-heading'"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="modal__header">
+      <h2 id="modal-heading">{{ heading() }}</h2>
+      <button type="button" class="modal__close" aria-label="Close dialog" (click)="close()">×</button>
+    </div>
+    <div class="modal__body">
+      <ng-content />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,36 @@
+<div class="container page">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <header class="page__header">
+    <h1>Guides</h1>
+    <p>In-depth, practical guides covering AI tool selection, SEO fundamentals, developer project setup, software choices and productivity systems.</p>
+  </header>
+
+  <div class="page__filters">
+    <input
+      type="search"
+      class="page__search"
+      placeholder="Search guides..."
+      [value]="searchTerm()"
+      (input)="searchTerm.set($any($event.target).value)"
+      aria-label="Search guides"
+    />
+    <div class="page__categories">
+      @for (category of categories; track category) {
+        <button type="button" [class.is-active]="activeCategory() === category" (click)="activeCategory.set(category)">{{ category }}</button>
+      }
+    </div>
+  </div>
+
+  @if (filtered().length) {
+    <div class="grid grid--3">
+      @for (guide of filtered(); track guide.slug) {
+        <app-guide-card [guide]="guide" />
+      }
+    </div>
+  } @else {
+    <app-empty-state title="No guides found" message="Try a different search term or category." />
+  }
+
+  <app-ad-banner />
+</div>

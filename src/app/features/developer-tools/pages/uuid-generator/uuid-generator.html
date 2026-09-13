@@ -1,0 +1,27 @@
+<app-tool-layout
+  title="UUID Generator"
+  description="Generate one or many random, cryptographically strong UUID v4 identifiers."
+  whatIsIt="A UUID (Universally Unique Identifier) is a 128-bit identifier that is, for practical purposes, guaranteed to be unique across systems without central coordination."
+  howItWorks="This tool calls the browser's built-in crypto.randomUUID() function, which uses a cryptographically secure random number generator, entirely on your device."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-controls">
+    <label>
+      Count
+      <input type="number" min="1" max="100" [value]="count()" (change)="setCount($any($event.target).value)" />
+    </label>
+    <label>
+      <input type="checkbox" [checked]="uppercase()" (change)="toggleUppercase()" />
+      Uppercase
+    </label>
+    <button type="button" class="tool-generate-btn" (click)="generate()">Generate new UUIDs</button>
+  </div>
+
+  <app-tool-output label="Generated UUIDs" [value]="output" [rows]="10" downloadFilename="uuids.txt" />
+</app-tool-layout>

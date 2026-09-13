@@ -1,0 +1,18 @@
+<app-card [interactive]="true" class="tutorial-card">
+  <a [routerLink]="['/guides', guide().slug]" class="tutorial-card__link">
+    <div class="tutorial-card__image" aria-hidden="true">{{ guide().category }}</div>
+    <div class="tutorial-card__body">
+      <div class="tutorial-card__meta">
+        <app-badge tone="primary">{{ guide().category }}</app-badge>
+        <span>{{ guide().readingTimeMinutes }} min read</span>
+      </div>
+      <h3>{{ guide().title }}</h3>
+      <p>{{ guide().description }}</p>
+    </div>
+  </a>
+
+  <div class="tutorial-card__footer">
+    <span class="tutorial-card__cta">Read guide &rarr;</span>
+    <app-favorite-button type="guide" [slug]="guide().slug" [name]="guide().title" />
+  </div>
+</app-card>

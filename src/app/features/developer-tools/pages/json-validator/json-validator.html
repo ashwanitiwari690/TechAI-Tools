@@ -1,0 +1,24 @@
+<app-tool-layout
+  title="JSON Validator"
+  description="Check whether your JSON is syntactically valid and get a clear explanation if it isn't."
+  whatIsIt="The JSON Validator checks a block of text against the JSON specification and reports whether it parses successfully."
+  howItWorks="It attempts to parse your input with the browser's built-in JSON parser and reports either success or the exact parser error, entirely on your device."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-grid-2">
+    <app-tool-input
+      label="JSON to validate"
+      placeholder="Paste your JSON here..."
+      [(value)]="input"
+      [hasExample]="true"
+      (loadExample)="loadExample()"
+    />
+    <app-tool-output label="Validation result" [value]="result().output" [error]="result().error" />
+  </div>
+</app-tool-layout>

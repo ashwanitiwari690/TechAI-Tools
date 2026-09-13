@@ -1,0 +1,25 @@
+<app-tool-layout
+  title="Case Converter"
+  description="Convert text between UPPERCASE, lowercase, Title Case, camelCase, snake_case and more — all at once."
+  whatIsIt="This tool takes any text and converts it into eight common case styles used in writing and programming, side by side."
+  howItWorks="Each case style applies a specific text transformation rule (such as splitting on word boundaries and re-joining with a separator) directly in your browser."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <app-tool-input label="Your text" placeholder="Type or paste text here..." [(value)]="input" [rows]="4" />
+
+  <div class="tool-result-row case-results">
+    @for (item of cases; track item.key) {
+      <div class="case-results__row">
+        <span class="case-results__label">{{ item.label }}</span>
+        <span class="case-results__value">{{ output(item.transform) }}</span>
+        <app-copy-button [text]="output(item.transform)" label="Copy" />
+      </div>
+    }
+  </div>
+</app-tool-layout>

@@ -1,0 +1,33 @@
+<div class="container page search-page">
+  <header class="page__header">
+    <h1>Search</h1>
+    <p>Search across AI tools, developer tools, software, tutorials, guides and comparisons.</p>
+    <div class="search-page__box">
+      <app-search-box placeholder="Search everything..." />
+    </div>
+  </header>
+
+  @if (!query()) {
+    <app-empty-state title="Start typing to search" message="Enter a search term above to find AI tools, developer tools, software, tutorials, guides and comparisons." />
+  } @else if (results().totalCount === 0) {
+    <app-empty-state [title]="'No results for “' + query() + '”'" message="Try a different or more general search term." />
+  } @else {
+    <p class="search-page__count">{{ results().totalCount }} result(s) for "{{ query() }}"</p>
+
+    @for (group of groups(); track group.label) {
+      <section class="search-page__group">
+        <h2>{{ group.label }}</h2>
+        <ul>
+          @for (item of group.items; track item.title) {
+            <li>
+              <a [routerLink]="item.routerLink">
+                <strong>{{ item.title }}</strong>
+                <span>{{ item.description }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</div>

@@ -1,0 +1,24 @@
+<app-tool-layout
+  title="Word & Character Counter"
+  description="Count words, characters, sentences and paragraphs, plus get an estimated reading time."
+  whatIsIt="This tool analyzes any text you paste and reports word count, character count (with and without spaces), sentence count, paragraph count and estimated reading time."
+  howItWorks="Counts are calculated with simple text-processing rules (splitting on whitespace, punctuation and blank lines) directly in your browser as you type."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <app-tool-input label="Your text" placeholder="Start typing or paste your text here..." [(value)]="input" [rows]="10" />
+
+  <div class="tool-result-row stat-grid">
+    <div class="stat-card"><span class="stat-card__value">{{ stats().words }}</span><span class="stat-card__label">Words</span></div>
+    <div class="stat-card"><span class="stat-card__value">{{ stats().characters }}</span><span class="stat-card__label">Characters</span></div>
+    <div class="stat-card"><span class="stat-card__value">{{ stats().charactersNoSpaces }}</span><span class="stat-card__label">Chars (no spaces)</span></div>
+    <div class="stat-card"><span class="stat-card__value">{{ stats().sentences }}</span><span class="stat-card__label">Sentences</span></div>
+    <div class="stat-card"><span class="stat-card__value">{{ stats().paragraphs }}</span><span class="stat-card__label">Paragraphs</span></div>
+    <div class="stat-card"><span class="stat-card__value">{{ stats().readingTimeMinutes }} min</span><span class="stat-card__label">Reading time</span></div>
+  </div>
+</app-tool-layout>

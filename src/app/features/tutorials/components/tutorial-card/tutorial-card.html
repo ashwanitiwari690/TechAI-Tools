@@ -1,0 +1,21 @@
+<app-card [interactive]="true" class="tutorial-card">
+  <a [routerLink]="['/tutorials', tutorial().slug]" class="tutorial-card__link">
+    <div class="tutorial-card__image" aria-hidden="true">{{ tutorial().category }}</div>
+    <div class="tutorial-card__body">
+      <div class="tutorial-card__meta">
+        <app-badge tone="primary">{{ tutorial().category }}</app-badge>
+        <span>{{ tutorial().readingTimeMinutes }} min read</span>
+      </div>
+      <h3>{{ tutorial().title }}</h3>
+      <p>{{ tutorial().description }}</p>
+    </div>
+  </a>
+
+  <div class="tutorial-card__footer">
+    <div class="tutorial-card__author">
+      <span class="tutorial-card__avatar" aria-hidden="true">{{ tutorial().author.avatarInitials }}</span>
+      <span>{{ tutorial().author.name }}</span>
+    </div>
+    <app-favorite-button type="tutorial" [slug]="tutorial().slug" [name]="tutorial().title" />
+  </div>
+</app-card>

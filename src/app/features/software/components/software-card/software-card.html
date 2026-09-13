@@ -1,0 +1,23 @@
+<app-card [interactive]="true" class="tool-card">
+  <a [routerLink]="['/software', item().slug]" class="tool-card__link">
+    <div class="tool-card__top">
+      <span class="tool-card__logo" aria-hidden="true">{{ item().logoInitials }}</span>
+      <div class="tool-card__heading">
+        <h3>{{ item().name }}</h3>
+        <app-rating [value]="item().rating" [reviewCount]="item().reviewCount" />
+      </div>
+    </div>
+
+    <p class="tool-card__desc">{{ item().shortDescription }}</p>
+
+    <div class="tool-card__tags">
+      <app-badge tone="primary">{{ item().category }}</app-badge>
+      <app-badge>{{ item().pricing }}</app-badge>
+    </div>
+  </a>
+
+  <div class="tool-card__footer">
+    <app-favorite-button type="software" [slug]="item().slug" [name]="item().name" />
+    <a [routerLink]="['/software', item().slug]" class="tool-card__cta">View details &rarr;</a>
+  </div>
+</app-card>

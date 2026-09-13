@@ -1,0 +1,32 @@
+<span class="rating" role="img" [attr.aria-label]="'Rating: ' + value() + ' out of 5'">
+  <span class="rating__stars">
+    @for (star of stars(); track $index) {
+      <svg class="rating__star" [class.is-empty]="star === 'empty'" viewBox="0 0 20 20" aria-hidden="true">
+        @if (star === 'half') {
+          <defs>
+            <linearGradient [id]="'half-' + $index">
+              <stop offset="50%" stop-color="currentColor" />
+              <stop offset="50%" stop-color="transparent" />
+            </linearGradient>
+          </defs>
+          <path
+            [attr.fill]="'url(#half-' + $index + ')'"
+            stroke="currentColor"
+            stroke-width="1"
+            d="M10 1.6l2.6 5.6 6 .7-4.4 4.2 1.2 6-5.4-3-5.4 3 1.2-6L1.4 7.9l6-.7L10 1.6z"
+          />
+        } @else {
+          <path
+            d="M10 1.6l2.6 5.6 6 .7-4.4 4.2 1.2 6-5.4-3-5.4 3 1.2-6L1.4 7.9l6-.7L10 1.6z"
+          />
+        }
+      </svg>
+    }
+  </span>
+  @if (showValue()) {
+    <span class="rating__value">{{ value().toFixed(1) }}</span>
+  }
+  @if (reviewCount() !== null) {
+    <span class="rating__count">({{ reviewCount() }})</span>
+  }
+</span>

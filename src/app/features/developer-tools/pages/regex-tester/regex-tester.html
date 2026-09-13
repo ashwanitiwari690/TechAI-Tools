@@ -1,0 +1,41 @@
+<app-tool-layout
+  title="Regex Tester"
+  description="Write and test regular expressions against your own sample text, with live match highlighting."
+  whatIsIt="A regular expression (regex) is a pattern used to match, extract or validate text. This tool lets you try a pattern against sample text and see exactly what it matches."
+  howItWorks="Your pattern and flags are compiled into a JavaScript RegExp object and run against your test text directly in the browser."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-controls">
+    <label>
+      Pattern
+      <input type="text" [value]="pattern()" (input)="pattern.set($any($event.target).value)" placeholder="e.g. \\d+" />
+    </label>
+    <label>
+      Flags
+      <input type="text" class="tool-controls__flags" [value]="flags()" (input)="setFlags($any($event.target).value)" placeholder="g i m" />
+    </label>
+  </div>
+
+  @if (result().error) {
+    <app-alert variant="error">{{ result().error }}</app-alert>
+  }
+
+  <app-tool-input label="Test text" [(value)]="testText" [rows]="6" />
+
+  <div class="tool-result-row">
+    <span class="tool-field__result-label">Matches ({{ result().matches.length }})</span>
+    <div class="regex-matches">
+      @for (match of result().matches; track $index) {
+        <app-badge tone="primary">{{ match }}</app-badge>
+      } @empty {
+        <span class="regex-matches__empty">No matches yet.</span>
+      }
+    </div>
+  </div>
+</app-tool-layout>

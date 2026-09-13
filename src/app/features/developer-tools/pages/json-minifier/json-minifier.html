@@ -1,0 +1,30 @@
+<app-tool-layout
+  title="JSON Minifier"
+  description="Strip whitespace and line breaks from JSON to produce the smallest possible payload."
+  whatIsIt="The JSON Minifier removes all non-essential whitespace from JSON text, producing a compact single-line version with identical data."
+  howItWorks="Your JSON is parsed and then re-serialized without any indentation, entirely in your browser."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  @if (savedBytes() > 0) {
+    <div class="tool-controls">
+      <span>Size reduced by approximately {{ savedBytes() }}%</span>
+    </div>
+  }
+
+  <div class="tool-grid-2">
+    <app-tool-input
+      label="Input JSON"
+      placeholder="Paste formatted JSON here..."
+      [(value)]="input"
+      [hasExample]="true"
+      (loadExample)="loadExample()"
+    />
+    <app-tool-output label="Minified JSON" [value]="result().output" [error]="result().error" downloadFilename="minified.json" />
+  </div>
+</app-tool-layout>

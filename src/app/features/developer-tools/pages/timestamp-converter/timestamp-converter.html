@@ -1,0 +1,47 @@
+<app-tool-layout
+  title="Timestamp Converter"
+  description="Convert between Unix timestamps and human-readable dates in both directions."
+  whatIsIt="A Unix timestamp counts seconds (or milliseconds) since January 1, 1970 UTC. This tool converts freely between that numeric format and readable dates."
+  howItWorks="Conversions use the browser's built-in Date object to parse and format values — everything runs locally, with no server involved."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-controls">
+    <button type="button" class="tool-generate-btn" (click)="setNow()">Use current time</button>
+  </div>
+
+  <div class="tool-grid-2">
+    <div class="tool-field">
+      <label for="unix-input">Unix timestamp</label>
+      <input id="unix-input" type="text" [value]="unixInput()" (input)="unixInput.set($any($event.target).value)" placeholder="e.g. 1700000000" />
+
+      @if (fromUnix().error) {
+        <app-alert variant="error">{{ fromUnix().error }}</app-alert>
+      } @else if (fromUnix().iso) {
+        <div class="tool-field__result">
+          <pre>{{ fromUnix().iso }}</pre>
+          <app-copy-button [text]="fromUnix().iso" />
+        </div>
+      }
+    </div>
+
+    <div class="tool-field">
+      <label for="date-input">Date &amp; time</label>
+      <input id="date-input" type="text" [value]="dateInput()" (input)="dateInput.set($any($event.target).value)" placeholder="e.g. 2026-01-15T09:30:00" />
+
+      @if (fromDate().error) {
+        <app-alert variant="error">{{ fromDate().error }}</app-alert>
+      } @else if (fromDate().unix) {
+        <div class="tool-field__result">
+          <pre>{{ fromDate().unix }}</pre>
+          <app-copy-button [text]="fromDate().unix" />
+        </div>
+      }
+    </div>
+  </div>
+</app-tool-layout>

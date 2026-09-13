@@ -1,0 +1,76 @@
+<div class="container legal-page">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <article class="article">
+    <header class="article__header">
+      <h1>Cookie Policy</h1>
+    </header>
+
+    <div class="article__body">
+      <p>
+        <strong>This is a starting-point cookie policy for a frontend-only demonstration project.</strong> Before
+        launch, this page should be reviewed against the specific privacy laws (such as GDPR/ePrivacy in the EU/UK,
+        or CCPA/CPRA in California) that apply to your actual audience.
+      </p>
+
+      <h2>What we use instead of tracking cookies today</h2>
+      <p>
+        This site currently stores a small amount of data directly in your browser's local storage rather than
+        traditional server-set cookies:
+      </p>
+
+      <div class="article__table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Purpose</th>
+              <th>Can be disabled?</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Necessary</td>
+              <td>Theme preference, cookie consent choice</td>
+              <td>No — required for basic site function</td>
+            </tr>
+            <tr>
+              <td>Preferences</td>
+              <td>Saved favorites (AI tools, software, tutorials, guides)</td>
+              <td>Yes — clearing your browser storage removes them</td>
+            </tr>
+            <tr>
+              <td>Analytics</td>
+              <td>Not currently active — reserved for future use</td>
+              <td>Yes, via the cookie preferences panel</td>
+            </tr>
+            <tr>
+              <td>Advertising</td>
+              <td>Not currently active — reserved for future Google AdSense integration</td>
+              <td>Yes, via the cookie preferences panel</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Managing your preferences</h2>
+      <p>
+        You can change your cookie preferences via the "Manage preferences" link in the cookie banner shown on your
+        first visit. If you've already made a choice and want to revisit it, use the button below to reset your
+        choice — the consent banner will reappear so you can choose again.
+      </p>
+      <p>Current status: <strong>{{ consent.status() }}</strong></p>
+      <button type="button" class="tool-generate-btn" (click)="consent.resetChoice()">Reset cookie choice</button>
+
+      <h2>Future advertising cookies</h2>
+      <p>
+        Once Google AdSense or another ad network is integrated, this policy will be updated to describe the
+        specific cookies that network sets and how to opt out, in line with that network's own disclosure
+        requirements.
+      </p>
+
+      <h2>Questions</h2>
+      <p>Questions about this policy can be sent via our <a routerLink="/contact">contact page</a>.</p>
+    </div>
+  </article>
+</div>

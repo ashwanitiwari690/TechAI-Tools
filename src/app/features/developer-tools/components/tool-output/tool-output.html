@@ -1,0 +1,17 @@
+<div class="tool-field">
+  <div class="tool-field__head">
+    <label>{{ label() }}</label>
+    <div class="tool-field__actions">
+      @if (canDownload()) {
+        <button type="button" (click)="download()">Download</button>
+      }
+      <app-copy-button [text]="value()" />
+    </div>
+  </div>
+
+  @if (error()) {
+    <app-alert variant="error">{{ error() }}</app-alert>
+  } @else {
+    <textarea [rows]="rows()" [value]="value()" readonly spellcheck="false" aria-label="Tool output"></textarea>
+  }
+</div>

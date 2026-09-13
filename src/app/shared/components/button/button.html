@@ -1,0 +1,25 @@
+<ng-template #content>
+  <ng-content />
+</ng-template>
+
+@if (href() || routerLink()) {
+  <a
+    class="btn btn--{{ variant() }} btn--{{ size() }}"
+    [class.btn--full]="fullWidth()"
+    [attr.href]="routerLink() ? null : href()"
+    [routerLink]="routerLink()"
+    [attr.target]="href() ? '_blank' : null"
+    [attr.rel]="href() ? 'noopener noreferrer nofollow' : null"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </a>
+} @else {
+  <button
+    class="btn btn--{{ variant() }} btn--{{ size() }}"
+    [class.btn--full]="fullWidth()"
+    [type]="type()"
+    [disabled]="disabled()"
+  >
+    <ng-container [ngTemplateOutlet]="content" />
+  </button>
+}

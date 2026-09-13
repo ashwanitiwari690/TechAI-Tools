@@ -1,0 +1,8 @@
+<div class="toast-container" role="status" aria-live="polite">
+  @for (toast of toastService.toasts(); track toast.id) {
+    <div class="toast toast--{{ toast.variant }}">
+      <span>{{ toast.text }}</span>
+      <button type="button" aria-label="Dismiss notification" (click)="toastService.dismiss(toast.id)">×</button>
+    </div>
+  }
+</div>

@@ -1,0 +1,29 @@
+<app-tool-layout
+  title="Lorem Ipsum Generator"
+  description="Generate placeholder Lorem Ipsum text — by paragraph, sentence or word — for mockups and layouts."
+  whatIsIt="Lorem Ipsum is scrambled, meaningless Latin-derived text traditionally used to preview typography and layout without the distraction of real content."
+  howItWorks="Words are randomly selected from a fixed pool of classic Lorem Ipsum vocabulary and assembled into sentences or paragraphs directly in your browser."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-controls">
+    <div class="segmented">
+      <button type="button" [class.is-active]="unit() === 'paragraphs'" (click)="setUnit('paragraphs')">Paragraphs</button>
+      <button type="button" [class.is-active]="unit() === 'sentences'" (click)="setUnit('sentences')">Sentences</button>
+      <button type="button" [class.is-active]="unit() === 'words'" (click)="setUnit('words')">Words</button>
+    </div>
+    <label>
+      Count
+      <input type="number" min="1" max="50" [value]="count()" (change)="setCount($any($event.target).value)" />
+    </label>
+    <label><input type="checkbox" [checked]="startWithLorem()" (change)="startWithLorem.set(!startWithLorem())" /> Start with "Lorem ipsum..."</label>
+    <button type="button" class="tool-generate-btn" (click)="generate()">Generate</button>
+  </div>
+
+  <app-tool-output label="Generated text" [value]="output()" [rows]="12" downloadFilename="lorem-ipsum.txt" />
+</app-tool-layout>

@@ -1,0 +1,48 @@
+<app-tool-layout
+  title="Color Converter"
+  description="Convert colors between HEX, RGB and HSL formats, with a visual color picker."
+  whatIsIt="This tool converts a color between the three most common web formats — HEX, RGB and HSL — so you can use whichever your CSS or design tool needs."
+  howItWorks="Your HEX value is parsed into red/green/blue channels, which are then used to calculate the equivalent RGB and HSL representations using standard color math, in your browser."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-controls">
+    <label>
+      Color picker
+      <input type="color" [value]="hexNormalized() || '#4f46e5'" (input)="setFromPicker($any($event.target).value)" />
+    </label>
+  </div>
+
+  <div class="tool-field">
+    <label for="hex-input">HEX</label>
+    <input id="hex-input" type="text" [value]="hexInput()" (input)="hexInput.set($any($event.target).value)" placeholder="#4f46e5" />
+  </div>
+
+  @if (!parsed()) {
+    <app-alert variant="error">Enter a valid 3- or 6-digit HEX color, e.g. #4f46e5 or #fff.</app-alert>
+  } @else {
+    <div class="tool-result-row color-preview" [style.background]="hexNormalized()"></div>
+
+    <div class="tool-result-row tool-grid-2">
+      <div class="tool-field__result">
+        <pre>{{ hexNormalized() }}</pre>
+        <app-copy-button [text]="hexNormalized()" />
+      </div>
+      <div class="tool-field__result">
+        <pre>{{ rgbString() }}</pre>
+        <app-copy-button [text]="rgbString()" />
+      </div>
+    </div>
+    <div class="tool-result-row">
+      <div class="tool-field__result">
+        <pre>{{ hslString() }}</pre>
+        <app-copy-button [text]="hslString()" />
+      </div>
+    </div>
+  }
+</app-tool-layout>

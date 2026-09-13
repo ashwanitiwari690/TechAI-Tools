@@ -1,0 +1,58 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.comparison-card__link {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  color: inherit;
+}
+
+.comparison-card__link:hover {
+  text-decoration: none;
+}
+
+.comparison-card__versus {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.comparison-card__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
+.comparison-card__vs {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-text-muted);
+}
+
+.comparison-card__link h3 {
+  font-size: 1.0625rem;
+  margin-bottom: 8px;
+}
+
+.comparison-card__link p {
+  font-size: 0.875rem;
+  margin-bottom: 14px;
+  flex: 1;
+}
+
+.comparison-card__cta {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}

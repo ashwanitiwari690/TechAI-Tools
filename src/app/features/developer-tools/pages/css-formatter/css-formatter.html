@@ -1,0 +1,18 @@
+<app-tool-layout
+  title="CSS Formatter"
+  description="Beautify minified or single-line CSS into a clean, readable stylesheet."
+  whatIsIt="This tool reformats CSS so each selector and declaration appears on its own line with consistent indentation."
+  howItWorks="It walks through your CSS character by character, tracking braces and semicolons to rebuild proper structure and indentation — entirely in your browser."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-grid-2">
+    <app-tool-input label="Input CSS" placeholder="Paste CSS here..." [(value)]="input" [hasExample]="true" (loadExample)="loadExample()" />
+    <app-tool-output label="Formatted CSS" [value]="output()" downloadFilename="formatted.css" />
+  </div>
+</app-tool-layout>

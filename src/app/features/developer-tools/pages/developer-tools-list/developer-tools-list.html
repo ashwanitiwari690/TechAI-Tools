@@ -1,0 +1,45 @@
+<div class="container page">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <header class="page__header">
+    <h1>Developer Tools</h1>
+    <p>Free, browser-based utilities for everyday development tasks — no installation, no sign-up, no data leaves your device.</p>
+  </header>
+
+  <div class="page__filters">
+    <input
+      type="search"
+      class="page__search"
+      placeholder="Search developer tools..."
+      [value]="searchTerm()"
+      (input)="searchTerm.set($any($event.target).value)"
+      aria-label="Search developer tools"
+    />
+    <div class="page__categories">
+      @for (category of categories; track category) {
+        <button type="button" [class.is-active]="activeCategory() === category" (click)="activeCategory.set(category)">
+          {{ category }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (filtered().length) {
+    <div class="grid grid--4">
+      @for (tool of filtered(); track tool.slug) {
+        <app-card [interactive]="true">
+          <a [routerLink]="['/developer-tools', tool.slug]" class="tool-tile">
+            <span class="tool-tile__icon" aria-hidden="true">{{ tool.icon }}</span>
+            <h3>{{ tool.name }}</h3>
+            <p>{{ tool.shortDescription }}</p>
+            <app-badge>{{ tool.category }}</app-badge>
+          </a>
+        </app-card>
+      }
+    </div>
+  } @else {
+    <app-empty-state title="No tools found" message="Try a different search term or category." />
+  }
+
+  <app-ad-banner />
+</div>

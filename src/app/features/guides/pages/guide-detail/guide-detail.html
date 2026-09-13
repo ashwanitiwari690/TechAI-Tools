@@ -1,0 +1,109 @@
+@if (guide(); as guide) {
+  <div class="container detail-page">
+    <app-breadcrumb [items]="breadcrumb()" />
+
+    <div class="detail-page__layout">
+      <article class="detail-page__main article">
+        <header class="article__header">
+          <div class="article__header-top">
+            <app-badge tone="primary">{{ guide.category }}</app-badge>
+            <app-favorite-button type="guide" [slug]="guide.slug" [name]="guide.title" />
+          </div>
+          <h1>{{ guide.title }}</h1>
+          <p class="article__description">{{ guide.description }}</p>
+
+          <div class="article__meta">
+            <span>Published <time [attr.datetime]="guide.publishedDate">{{ guide.publishedDate }}</time></span>
+            <span class="article__meta-divider" aria-hidden="true">·</span>
+            <span>{{ guide.readingTimeMinutes }} min read</span>
+          </div>
+        </header>
+
+        <div class="article__image" aria-hidden="true">{{ guide.imagePlaceholderLabel }}</div>
+
+        <nav class="article__toc" aria-label="Table of contents">
+          <h2>In this guide</h2>
+          <ol>
+            @for (heading of toc(); track heading) {
+              <li><a [href]="'#' + slugify(heading)">{{ heading }}</a></li>
+            }
+          </ol>
+        </nav>
+
+        <div class="article__body">
+          @for (section of guide.sections; track section.heading; let i = $index) {
+            @if (section.level === 2) {
+              <h2 [id]="slugify(section.heading)">{{ section.heading }}</h2>
+            } @else {
+              <h3 [id]="slugify(section.heading)">{{ section.heading }}</h3>
+            }
+
+            @for (paragraph of section.paragraphs; track paragraph) {
+              <p>{{ paragraph }}</p>
+            }
+
+            @if (section.bullets) {
+              <ul>
+                @for (item of section.bullets; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            }
+
+            @if (section.numbered) {
+              <ol class="article__numbered">
+                @for (item of section.numbered; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ol>
+            }
+
+            @if (section.table) {
+              <div class="article__table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      @for (header of section.table.headers; track header) {
+                        <th>{{ header }}</th>
+                      }
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of section.table.rows; track $index) {
+                      <tr>
+                        @for (cell of row; track $index) {
+                          <td>{{ cell }}</td>
+                        }
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+
+            @if (i === 1) {
+              <app-ad-in-article />
+            }
+          }
+        </div>
+
+        <app-faq-accordion [items]="guide.faq" />
+
+        @if (related().length) {
+          <section class="detail-section">
+            <h2>Related guides</h2>
+            <div class="grid grid--3">
+              @for (item of related(); track item.slug) {
+                <app-guide-card [guide]="item" />
+              }
+            </div>
+          </section>
+        }
+      </article>
+
+      <aside class="detail-page__sidebar">
+        <app-ad-rectangle />
+      </aside>
+    </div>
+  </div>
+}

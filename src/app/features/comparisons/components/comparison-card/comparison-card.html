@@ -1,0 +1,12 @@
+<app-card [interactive]="true" class="comparison-card">
+  <a [routerLink]="['/comparisons', comparison().slug]" class="comparison-card__link">
+    <div class="comparison-card__versus">
+      <span class="comparison-card__logo">{{ comparison().itemA.logoInitials }}</span>
+      <span class="comparison-card__vs">VS</span>
+      <span class="comparison-card__logo">{{ comparison().itemB.logoInitials }}</span>
+    </div>
+    <h3>{{ comparison().title }}</h3>
+    <p>{{ comparison().description }}</p>
+    <span class="comparison-card__cta">Read comparison &rarr;</span>
+  </a>
+</app-card>

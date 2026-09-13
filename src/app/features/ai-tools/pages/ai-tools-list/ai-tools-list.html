@@ -1,0 +1,57 @@
+<div class="container page">
+  <app-breadcrumb [items]="breadcrumb" />
+
+  <header class="page__header">
+    <h1>AI Tools Directory</h1>
+    <p>Browse curated AI tools for writing, coding, image and video generation, marketing, research and more — filter by category and pricing to find the right fit.</p>
+  </header>
+
+  <div class="page__filters">
+    <input
+      type="search"
+      class="page__search"
+      placeholder="Search AI tools by name, description or tag..."
+      [value]="searchTerm()"
+      (input)="updateSearch($any($event.target).value)"
+      aria-label="Search AI tools"
+    />
+
+    <div class="page__categories">
+      @for (category of categories; track category) {
+        <button type="button" [class.is-active]="activeCategory() === category" (click)="updateCategory(category)">{{ category }}</button>
+      }
+    </div>
+
+    <div class="page__filter-group">
+      @for (option of pricingOptions; track option) {
+        <button type="button" [class.is-active]="activePricing() === option" (click)="updatePricing(option)">{{ option }}</button>
+      }
+    </div>
+  </div>
+
+  <div class="page__toolbar">
+    <span class="page__result-count">{{ filteredAndSorted().length }} tools found</span>
+    <label class="page__sort">
+      Sort by
+      <select (change)="updateSort($any($event.target).value)">
+        @for (option of sortOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (pagedTools().length) {
+    <div class="grid grid--3">
+      @for (tool of pagedTools(); track tool.slug) {
+        <app-ai-tool-card [tool]="tool" />
+      }
+    </div>
+
+    <app-pagination [currentPage]="page()" [totalPages]="totalPages()" (pageChange)="page.set($event)" />
+  } @else {
+    <app-empty-state title="No AI tools match your filters" message="Try clearing the search box or choosing a different category." />
+  }
+
+  <app-ad-banner />
+</div>

@@ -1,0 +1,26 @@
+<app-tool-layout
+  title="JWT Decoder"
+  description="Decode a JSON Web Token to inspect its header and payload claims — signature verification not included."
+  whatIsIt="A JSON Web Token (JWT) is made of three Base64URL-encoded segments — header, payload and signature — separated by dots. This tool decodes the header and payload back into readable JSON."
+  howItWorks="Each segment is Base64URL-decoded and parsed as JSON directly in your browser. The signature segment is not verified, since that requires a secret or public key."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <app-tool-input
+    label="JWT"
+    placeholder="Paste your JWT here (header.payload.signature)..."
+    [(value)]="input"
+    [hasExample]="true"
+    (loadExample)="loadExample()"
+  />
+
+  <div class="tool-result-row tool-grid-2">
+    <app-tool-output label="Decoded header" [value]="result().header" [error]="result().error" [rows]="6" />
+    <app-tool-output label="Decoded payload" [value]="result().payload" [error]="result().error" [rows]="6" />
+  </div>
+</app-tool-layout>

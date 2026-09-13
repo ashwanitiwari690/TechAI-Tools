@@ -1,0 +1,31 @@
+<app-tool-layout
+  title="URL Encoder / Decoder"
+  description="Percent-encode text for safe use in URLs, or decode an already-encoded URL component."
+  whatIsIt="URL (percent) encoding converts characters that aren't safe inside a URL into a % followed by a hex code. This tool converts freely in both directions."
+  howItWorks="Encoding uses the browser's encodeURIComponent, and decoding uses decodeURIComponent — both run locally, entirely in your browser."
+  [howToUse]="howToUse"
+  [example]="example"
+  [useCases]="useCases"
+  [benefits]="benefits"
+  [limitations]="limitations"
+  [faq]="faq"
+  [relatedTools]="relatedTools"
+>
+  <div class="tool-controls">
+    <div class="segmented">
+      <button type="button" [class.is-active]="mode() === 'encode'" (click)="setMode('encode')">Encode</button>
+      <button type="button" [class.is-active]="mode() === 'decode'" (click)="setMode('decode')">Decode</button>
+    </div>
+  </div>
+
+  <div class="tool-grid-2">
+    <app-tool-input
+      [label]="mode() === 'encode' ? 'Plain text' : 'Encoded text'"
+      placeholder="Type or paste text here..."
+      [(value)]="input"
+      [hasExample]="true"
+      (loadExample)="loadExample()"
+    />
+    <app-tool-output [label]="mode() === 'encode' ? 'Encoded output' : 'Decoded output'" [value]="result().output" [error]="result().error" />
+  </div>
+</app-tool-layout>
