@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { ThemeService, ThemePreference } from '../../core/services/theme.service';
 import { SearchBox } from '../../shared/components/search-box/search-box';
 import { Dropdown, DropdownOption } from '../../shared/components/dropdown/dropdown';
+import { LogoMark } from '../../shared/components/logo-mark/logo-mark';
 
 interface NavLink {
   label: string;
@@ -11,7 +12,7 @@ interface NavLink {
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, RouterLinkActive, SearchBox, Dropdown],
+  imports: [RouterLink, RouterLinkActive, SearchBox, Dropdown, LogoMark],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
