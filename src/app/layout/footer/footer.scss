@@ -31,19 +31,6 @@
   text-decoration: none;
 }
 
-.footer__logo-mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: var(--radius-sm);
-  background: var(--color-primary);
-  color: var(--color-primary-contrast);
-  font-weight: 800;
-  font-size: 0.75rem;
-}
-
 .footer__col {
   display: flex;
   flex-direction: column;

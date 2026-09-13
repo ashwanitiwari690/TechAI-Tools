@@ -10,6 +10,12 @@
   margin: 0 auto;
 }
 
+.hero__logo {
+  display: inline-flex;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 8px 20px rgb(79 70 229 / 0.25));
+}
+
 .hero__inner h1 {
   font-size: 2.75rem;
   margin: 0 0 16px;

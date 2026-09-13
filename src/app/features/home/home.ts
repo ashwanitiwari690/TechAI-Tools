@@ -10,6 +10,7 @@ import { SearchBox } from '../../shared/components/search-box/search-box';
 import { Button } from '../../shared/components/button/button';
 import { Card } from '../../shared/components/card/card';
 import { AdBanner } from '../../shared/components/ad-banner/ad-banner';
+import { LogoMark } from '../../shared/components/logo-mark/logo-mark';
 import { SeoService } from '../../core/services/seo.service';
 
 interface CategoryTile {
@@ -19,7 +20,7 @@ interface CategoryTile {
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, ReactiveFormsModule, AiToolCard, TutorialCard, SearchBox, Button, Card, AdBanner],
+  imports: [RouterLink, ReactiveFormsModule, AiToolCard, TutorialCard, SearchBox, Button, Card, AdBanner, LogoMark],
   templateUrl: './home.html',
   styleUrl: './home.scss'
 })
