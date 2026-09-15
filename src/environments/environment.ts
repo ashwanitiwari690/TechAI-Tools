@@ -11,6 +11,6 @@
  * widget stays fully inert until someone configures a real campaign key.
  */
 export const environment = {
-  earnivoApiBaseUrl: 'http://localhost:4227/api',
-  earnivoApiKey: 'ak_850959ab630ba15d82651d6e86c5012df319b07cb86150cc',
+  earnivoApiBaseUrl: 'https://api.admobility.in/api',
+  earnivoApiKey: 'ak_c2a5aa86a14a7972060644d7739a1c3fc22a3109782a19d4',
 };
