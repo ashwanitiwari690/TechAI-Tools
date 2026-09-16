@@ -1,6 +1,12 @@
-import {Component,DestroyRef,OnInit,computed,inject,signal,
+import {
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+
 import { EarnivoService } from '../../../core/services/earnivo.service';
 
 @Component({
@@ -9,11 +15,23 @@ import { EarnivoService } from '../../../core/services/earnivo.service';
   styleUrl: './earnivo-widget.scss',
 })
 export class EarnivoWidget implements OnInit {
-  protected readonly earnivo = inject(EarnivoService);
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly route = inject(ActivatedRoute);
-  protected readonly bottomOffset = signal(16);
-  protected readonly formattedTime = computed(() => {
+  protected readonly earnivo =
+    inject(EarnivoService);
+
+  private readonly destroyRef =
+    inject(DestroyRef);
+
+  /**
+   * Gap from bottom of viewport.
+   */
+  protected readonly bottomOffset =
+    signal(16);
+
+  /**
+   * Format countdown.
+   */
+  protected readonly formattedTime =
+    computed(() => {
       const seconds = Math.max(
         0,
         this.earnivo.remainingSeconds()
@@ -26,30 +44,97 @@ export class EarnivoWidget implements OnInit {
       const minutes =
         Math.floor(seconds / 60);
 
-      const remaining =
-        String(seconds % 60).padStart(
-          2,
-          '0'
-        );
+      const remainingSeconds =
+        String(
+          seconds % 60
+        ).padStart(2, '0');
 
-      return `${minutes}m ${remaining}s`;
+      return `${minutes}m ${remainingSeconds}s`;
     });
 
   ngOnInit(): void {
-    this.route.queryParamMap.subscribe(
-      (params) => {
-        const token =
-          params.get('ev_token');
+    /**
+     * Read ev_token directly from
+     * the browser URL.
+     *
+     * Example:
+     *
+     * https://tech-ai-tools-bay.vercel.app/
+     * ?ev_token=vt_xxxxx
+     */
+    this.initializeEarnivo();
 
-        void this.earnivo.init(
-          token
-        );
-      }
-    );
+    /**
+     * Watch cookie consent banner.
+     */
     this.watchOtherFixedBottomUi();
   }
 
+  /**
+   * Initialize Earnivo.
+   */
+  private initializeEarnivo(): void {
+    if (
+      typeof window === 'undefined'
+    ) {
+      return;
+    }
 
+    try {
+      const url = new URL(
+        window.location.href
+      );
+
+      const token =
+        url.searchParams.get(
+          'ev_token'
+        );
+
+      console.log(
+        '[Earnivo Widget] Current URL:',
+        window.location.href
+      );
+
+      console.log(
+        '[Earnivo Widget] ev_token:',
+        token
+      );
+
+      if (!token) {
+        console.warn(
+          '[Earnivo Widget] ev_token not found.'
+        );
+
+        /**
+         * Service will check
+         * sessionStorage.
+         */
+        void this.earnivo.init();
+
+        return;
+      }
+
+      console.log(
+        '[Earnivo Widget] Token found.'
+      );
+
+      /**
+       * Pass exact token to service.
+       */
+      void this.earnivo.init(
+        token
+      );
+    } catch (error) {
+      console.error(
+        '[Earnivo Widget] URL token error:',
+        error
+      );
+    }
+  }
+
+  /**
+   * Watch cookie consent banner.
+   */
   private watchOtherFixedBottomUi(): void {
     if (
       typeof document === 'undefined' ||
@@ -109,11 +194,9 @@ export class EarnivoWidget implements OnInit {
     sync();
 
     const mutationObserver =
-      new MutationObserver(
-        () => {
-          sync();
-        }
-      );
+      new MutationObserver(() => {
+        sync();
+      });
 
     mutationObserver.observe(
       bannerHost,
@@ -123,23 +206,22 @@ export class EarnivoWidget implements OnInit {
       }
     );
 
-    this.destroyRef.onDestroy(
-      () => {
-        mutationObserver.disconnect();
+    this.destroyRef.onDestroy(() => {
+      mutationObserver.disconnect();
 
-        resizeObserver?.disconnect();
-      }
-    );
+      resizeObserver?.disconnect();
+    });
   }
 
   /**
-   * Update widget bottom offset.
+   * Update bottom offset.
    */
   private updateBottomOffset(
     banner: HTMLElement
   ): void {
     const bannerHeight =
-      banner.getBoundingClientRect()
+      banner
+        .getBoundingClientRect()
         .height;
 
     this.bottomOffset.set(
