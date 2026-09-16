@@ -1,4 +1,6 @@
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import {Component,DestroyRef,OnInit,computed,inject,signal,
+} from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { EarnivoService } from '../../../core/services/earnivo.service';
 
 @Component({
@@ -9,71 +11,139 @@ import { EarnivoService } from '../../../core/services/earnivo.service';
 export class EarnivoWidget implements OnInit {
   protected readonly earnivo = inject(EarnivoService);
   private readonly destroyRef = inject(DestroyRef);
-
-  /** Gap from the viewport bottom, kept clear of whatever other fixed bottom UI (e.g. the cookie banner) is showing. */
+  private readonly route = inject(ActivatedRoute);
   protected readonly bottomOffset = signal(16);
-
   protected readonly formattedTime = computed(() => {
-    const seconds = Math.max(0, this.earnivo.remainingSeconds());
-    if (seconds < 60) {
-      return `${seconds}s`;
-    }
-    return `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, '0')}s`;
-  });
+      const seconds = Math.max(
+        0,
+        this.earnivo.remainingSeconds()
+      );
+
+      if (seconds < 60) {
+        return `${seconds}s`;
+      }
+
+      const minutes =
+        Math.floor(seconds / 60);
+
+      const remaining =
+        String(seconds % 60).padStart(
+          2,
+          '0'
+        );
+
+      return `${minutes}m ${remaining}s`;
+    });
 
   ngOnInit(): void {
-    this.earnivo.init();
+    this.route.queryParamMap.subscribe(
+      (params) => {
+        const token =
+          params.get('ev_token');
+
+        void this.earnivo.init(
+          token
+        );
+      }
+    );
     this.watchOtherFixedBottomUi();
   }
 
-  /**
-   * The cookie-consent banner is the other fixed-bottom UI in this app, and its
-   * height swings widely (buttons wrap on narrow phones). Rather than guess a
-   * fixed offset, measure it live: a ResizeObserver on the banner element for
-   * height changes, plus a MutationObserver — scoped to the cookie-consent host,
-   * not document.body — to catch it being added or removed outright.
-   */
+
   private watchOtherFixedBottomUi(): void {
-    if (typeof document === 'undefined' || typeof ResizeObserver === 'undefined') {
+    if (
+      typeof document === 'undefined' ||
+      typeof ResizeObserver ===
+        'undefined'
+    ) {
       return;
     }
 
-    const bannerHost = document.querySelector('app-cookie-consent');
+    const bannerHost =
+      document.querySelector(
+        'app-cookie-consent'
+      );
+
     if (!bannerHost) {
       return;
     }
 
-    let resizeObserver: ResizeObserver | null = null;
+    let resizeObserver:
+      | ResizeObserver
+      | null = null;
 
     const sync = (): void => {
-      const banner = bannerHost.querySelector<HTMLElement>('.cookie-banner');
+      const banner =
+        bannerHost.querySelector<HTMLElement>(
+          '.cookie-banner'
+        );
 
       if (banner) {
         if (!resizeObserver) {
-          // Re-measure with getBoundingClientRect() rather than trusting the callback's
-          // entries[0].contentRect — that reports the content box only, excluding the
-          // banner's own padding/border, which would silently undercount its real footprint.
-          resizeObserver = new ResizeObserver(() => {
-            this.bottomOffset.set(16 + banner.getBoundingClientRect().height);
-          });
-          resizeObserver.observe(banner);
+          resizeObserver =
+            new ResizeObserver(
+              () => {
+                this.updateBottomOffset(
+                  banner
+                );
+              }
+            );
+
+          resizeObserver.observe(
+            banner
+          );
         }
-        this.bottomOffset.set(16 + banner.getBoundingClientRect().height);
+
+        this.updateBottomOffset(
+          banner
+        );
       } else {
         resizeObserver?.disconnect();
+
         resizeObserver = null;
+
         this.bottomOffset.set(16);
       }
     };
 
     sync();
 
-    const mutationObserver = new MutationObserver(sync);
-    mutationObserver.observe(bannerHost, { childList: true });
+    const mutationObserver =
+      new MutationObserver(
+        () => {
+          sync();
+        }
+      );
 
-    this.destroyRef.onDestroy(() => {
-      mutationObserver.disconnect();
-      resizeObserver?.disconnect();
-    });
+    mutationObserver.observe(
+      bannerHost,
+      {
+        childList: true,
+        subtree: true,
+      }
+    );
+
+    this.destroyRef.onDestroy(
+      () => {
+        mutationObserver.disconnect();
+
+        resizeObserver?.disconnect();
+      }
+    );
+  }
+
+  /**
+   * Update widget bottom offset.
+   */
+  private updateBottomOffset(
+    banner: HTMLElement
+  ): void {
+    const bannerHeight =
+      banner.getBoundingClientRect()
+        .height;
+
+    this.bottomOffset.set(
+      16 + bannerHeight
+    );
   }
 }
