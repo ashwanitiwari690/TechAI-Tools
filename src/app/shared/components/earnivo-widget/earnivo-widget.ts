@@ -22,8 +22,40 @@ export class EarnivoWidget implements OnInit {
   });
 
   ngOnInit(): void {
-    this.earnivo.init();
+    this.initializeEarnivo();
     this.watchOtherFixedBottomUi();
+  }
+
+  /**
+   * Capture the campaign token immediately from the real browser URL.
+   *
+   * The Earnivo app opens this site as:
+   * https://your-site.com/?ev_token=...
+   *
+   * Do not depend on Angular route parameters here because `ev_token`
+   * belongs to the external URL query string, not an Angular route segment.
+   */
+  private initializeEarnivo(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      const url = new URL(window.location.href);
+      const token = url.searchParams.get('ev_token');
+
+      console.log('[Earnivo Widget] Current URL:', window.location.href);
+      console.log('[Earnivo Widget] ev_token:', token);
+
+      if (token) {
+        this.earnivo.init(token);
+      } else {
+        this.earnivo.init();
+      }
+    } catch (error) {
+      console.error('[Earnivo Widget] Could not read URL:', error);
+      this.earnivo.init();
+    }
   }
 
   /**
