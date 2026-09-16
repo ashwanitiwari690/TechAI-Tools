@@ -1,25 +1,15 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-
 import { environment } from '../../../environments/environment';
 
 export type EarnivoStatus =
-  | 'inactive'
-  | 'loading'
-  | 'waiting'
-  | 'ready'
-  | 'claiming'
-  | 'claimed'
-  | 'error';
+  'inactive' | 'loading' | 'waiting' | 'ready' | 'claiming' | 'claimed' | 'error';
 
 interface EarnivoApiEnvelope<T> {
   success: boolean;
   data: T;
-  error?: {
-    code: string;
-    message: string;
-  };
+  error?: { code: string; message: string };
 }
 
 interface EarnivoSessionData {
@@ -50,9 +40,12 @@ const TOKEN_STORAGE_KEY = 'earnivo_token';
 const CLAIM_STORAGE_PREFIX = 'earnivo_claim_';
 const DISMISSED_STORAGE_PREFIX = 'earnivo_dismissed_';
 
-@Injectable({
-  providedIn: 'root',
-})
+/**
+ * Root-provided state for the Earnivo visit-reward widget. Survives client-side
+ * navigation because it's a singleton, unlike a component that gets torn down
+ * and rebuilt as the router swaps pages.
+ */
+@Injectable({ providedIn: 'root' })
 export class EarnivoService {
   private readonly http = inject(HttpClient);
 
@@ -64,191 +57,79 @@ export class EarnivoService {
   private readonly _remainingSeconds = signal(0);
   private readonly _errorMessage = signal('');
   private readonly _lastClaimError = signal<string | null>(null);
-
-  private readonly _pageActive = signal(
-    this.isPageActive()
-  );
+  private readonly _pageActive = signal(this.isPageActive());
 
   readonly status = this._status.asReadonly();
   readonly campaignName = this._campaignName.asReadonly();
   readonly taskTitle = this._taskTitle.asReadonly();
   readonly rewardAmount = this._rewardAmount.asReadonly();
-  readonly requiredSeconds =
-    this._requiredSeconds.asReadonly();
-  readonly remainingSeconds =
-    this._remainingSeconds.asReadonly();
-  readonly errorMessage =
-    this._errorMessage.asReadonly();
-  readonly lastClaimError =
-    this._lastClaimError.asReadonly();
+  readonly requiredSeconds = this._requiredSeconds.asReadonly();
+  readonly remainingSeconds = this._remainingSeconds.asReadonly();
+  readonly errorMessage = this._errorMessage.asReadonly();
+  readonly lastClaimError = this._lastClaimError.asReadonly();
 
-  readonly paused = computed(
-    () =>
-      this._status() === 'waiting' &&
-      !this._pageActive()
-  );
+  /** True while a countdown exists but is stalled because the tab isn't actively being looked at. */
+  readonly paused = computed(() => this._status() === 'waiting' && !this._pageActive());
 
+  /** Measured against the full required duration, so a visitor resuming mid-visit sees a part-filled bar, not an empty one. */
   readonly progressPercent = computed(() => {
     const required = this._requiredSeconds();
-    const remaining = this._remainingSeconds();
-
     if (required <= 0) {
       return 100;
     }
-
-    return Math.min(
-      100,
-      Math.max(
-        0,
-        Math.round(
-          ((required - remaining) / required) * 100
-        )
-      )
-    );
+    return Math.round(((required - this._remainingSeconds()) / required) * 100);
   });
 
   private token: string | null = null;
-
-  private intervalId:
-    ReturnType<typeof setInterval> | null = null;
-
+  private initialized = false;
   private listenersBound = false;
+  private intervalId: ReturnType<typeof setInterval> | null = null;
 
   /**
-   * Initialize Earnivo session.
-   *
-   * Token is passed explicitly from the component.
+   * Reads the token, checks whether it's already been claimed or dismissed, and —
+   * if neither — validates it with Earnivo. Safe to call multiple times; only the
+   * first call does anything. No-ops entirely (no storage access, no network calls,
+   * no listeners) when no API key is configured or no token is present, so the
+   * widget stays inert on deployments that never opted into a campaign.
    */
-  async init(
-    token?: string | null
-  ): Promise<void> {
-    if (!environment.earnivoApiKey) {
-      console.warn(
-        '[Earnivo] API key is missing.'
-      );
+  init(): void {
+    if (this.initialized) {
+      return;
+    }
+    this.initialized = true;
+
+    if (!environment.earnivoApiKey || typeof window === 'undefined') {
       return;
     }
 
-    if (typeof window === 'undefined') {
+    this.token = this.resolveToken();
+    if (!this.token) {
       return;
     }
 
-    const resolvedToken =
-      this.normalizeToken(
-        token ?? this.getTokenFromUrlOrStorage()
-      );
-
-    console.log(
-      '[Earnivo] init token:',
-      token
-    );
-
-    console.log(
-      '[Earnivo] resolved token:',
-      resolvedToken
-    );
-
-    if (!resolvedToken) {
-      console.warn(
-        '[Earnivo] No token found.'
-      );
-
-      this.reset();
-
+    // A visitor who explicitly closed the card on a finished task (claimed, or a
+    // dead link) already saw everything it had to say — a refresh shouldn't put
+    // it back in front of them. Checked before the claimed-state cache on purpose:
+    // closing a completed claim is exactly the case this guards.
+    if (sessionStorage.getItem(DISMISSED_STORAGE_PREFIX + this.token) === '1') {
       return;
     }
 
-    /**
-     * Same token is already active.
-     */
-    if (this.token === resolvedToken) {
-      console.log(
-        '[Earnivo] Same token already active.'
-      );
-
-      return;
-    }
-
-    /**
-     * Reset old campaign state.
-     */
-    this.resetSessionState();
-
-    /**
-     * Set new token.
-     */
-    this.token = resolvedToken;
-
-    /**
-     * Store token for current browser session.
-     */
-    sessionStorage.setItem(
-      TOKEN_STORAGE_KEY,
-      resolvedToken
-    );
-
-    console.log(
-      '[Earnivo] Token stored:',
-      resolvedToken
-    );
-
-    /**
-     * Remove ev_token from URL.
-     */
-    this.removeTokenFromUrl();
-
-    /**
-     * Bind visibility listeners.
-     */
-    this.bindVisibilityListeners();
-
-    /**
-     * Check if this token was already claimed.
-     */
-    const cachedClaim =
-      this.readClaim(resolvedToken);
-
+    const cachedClaim = this.readClaim(this.token);
     if (cachedClaim) {
-      this._campaignName.set(
-        cachedClaim.campaignName
-      );
-
-      this._taskTitle.set(
-        cachedClaim.taskTitle
-      );
-
-      this._rewardAmount.set(
-        cachedClaim.rewardAmount
-      );
-
+      this._campaignName.set(cachedClaim.campaignName);
+      this._taskTitle.set(cachedClaim.taskTitle);
+      this._rewardAmount.set(cachedClaim.rewardAmount);
       this._status.set('claimed');
-
       return;
     }
 
-    /**
-     * Fetch campaign session.
-     */
-    await this.fetchSession(
-      resolvedToken
-    );
+    this.bindVisibilityListeners();
+    void this.fetchSession();
   }
 
-  /**
-   * Claim reward.
-   */
   async claimReward(): Promise<void> {
-    const currentToken = this.token;
-
-    if (!currentToken) {
-      this._lastClaimError.set(
-        'Reward token is missing.'
-      );
-
-      return;
-    }
-
-    if (this._status() !== 'ready') {
+    if (this._status() !== 'ready' || !this.token) {
       return;
     }
 
@@ -256,658 +137,194 @@ export class EarnivoService {
     this._status.set('claiming');
 
     try {
-      const requestBody = {
-        apiKey: environment.earnivoApiKey,
-        token: currentToken,
-      };
-
-      console.log(
-        '[Earnivo] Confirm request:',
-        requestBody
+      const res = await firstValueFrom(
+        this.http.post<EarnivoApiEnvelope<EarnivoConfirmData>>(
+          `${environment.earnivoApiBaseUrl}/website-verification/confirm`,
+          { apiKey: environment.earnivoApiKey, token: this.token },
+        ),
       );
 
-      const response =
-        await firstValueFrom(
-          this.http.post<
-            EarnivoApiEnvelope<EarnivoConfirmData>
-          >(
-            `${environment.earnivoApiBaseUrl}/website-verification/confirm`,
-            requestBody
-          )
-        );
-
-      console.log(
-        '[Earnivo] Confirm response:',
-        response
-      );
-
-      if (
-        !response?.success ||
-        !response?.data
-      ) {
-        throw new Error(
-          response?.error?.message ||
-            'Claim failed.'
-        );
+      if (!res.success || !res.data) {
+        throw new Error(res.error?.message || 'Claim failed.');
       }
 
-      const rewardAmount =
-        response.data.rewardAmount ??
-        this._rewardAmount();
-
-      this._rewardAmount.set(
-        rewardAmount
-      );
-
-      this.writeClaim(
-        currentToken,
-        {
-          campaignName:
-            this._campaignName(),
-
-          taskTitle:
-            this._taskTitle(),
-
-          rewardAmount,
-        }
-      );
-
-      this.stopTimer();
-
+      const rewardAmount = res.data.rewardAmount ?? this._rewardAmount();
+      this._rewardAmount.set(rewardAmount);
+      this.writeClaim(this.token, {
+        campaignName: this._campaignName(),
+        taskTitle: this._taskTitle(),
+        rewardAmount,
+      });
       this._status.set('claimed');
-    } catch (error) {
-      console.error(
-        '[Earnivo] Claim error:',
-        error
-      );
-
+    } catch (err) {
+      // Retryable — a visitor who genuinely earned the reward shouldn't get stranded.
       this._lastClaimError.set(
-        this.extractMessage(
-          error,
-          'Could not claim your reward. Please try again.'
-        )
+        this.extractMessage(err, 'Could not claim your reward. Please try again.'),
       );
-
       this._status.set('ready');
     }
   }
 
   /**
-   * Dismiss widget.
+   * Hides the card. A terminal state (claimed, or a dead link) is remembered past
+   * this tab session so a refresh doesn't put it back in front of the visitor.
+   * Dismissing mid-task (waiting/ready) is treated as "hide for now" only — the
+   * visitor still has an unclaimed reward, and a refresh should still offer it.
    */
   dismiss(): void {
     this.stopTimer();
-
-    const currentToken = this.token;
-    const currentStatus = this._status();
-
-    if (
-      currentToken &&
-      (
-        currentStatus === 'claimed' ||
-        currentStatus === 'error'
-      )
-    ) {
-      sessionStorage.setItem(
-        DISMISSED_STORAGE_PREFIX +
-          currentToken,
-        '1'
-      );
+    if (this.token && (this._status() === 'claimed' || this._status() === 'error')) {
+      sessionStorage.setItem(DISMISSED_STORAGE_PREFIX + this.token, '1');
     }
-
     this._status.set('inactive');
   }
 
-  /**
-   * Fetch Earnivo session.
-   */
-  private async fetchSession(
-    token: string
-  ): Promise<void> {
+  private async fetchSession(): Promise<void> {
     this._status.set('loading');
 
-    this._errorMessage.set('');
-    this._lastClaimError.set(null);
-
-    const requestBody = {
-      apiKey: environment.earnivoApiKey,
-      token,
-    };
-
-    console.log(
-      '[Earnivo] Session request:',
-      requestBody
-    );
-
     try {
-      const response =
-        await firstValueFrom(
-          this.http.post<
-            EarnivoApiEnvelope<EarnivoSessionData>
-          >(
-            `${environment.earnivoApiBaseUrl}/website-verification/session`,
-            requestBody
-          )
-        );
-
-      console.log(
-        '[Earnivo] Session response:',
-        response
+      const res = await firstValueFrom(
+        this.http.post<EarnivoApiEnvelope<EarnivoSessionData>>(
+          `${environment.earnivoApiBaseUrl}/website-verification/session`,
+          { apiKey: environment.earnivoApiKey, token: this.token },
+        ),
       );
 
-      /**
-       * Ignore response if user has
-       * already switched to another token.
-       */
-      if (this.token !== token) {
-        console.warn(
-          '[Earnivo] Token changed. Ignoring old response.'
-        );
-
-        return;
+      if (!res.success || !res.data) {
+        throw new Error(res.error?.message || 'Unable to verify this visit link.');
       }
 
-      if (
-        !response?.success ||
-        !response?.data
-      ) {
-        throw new Error(
-          response?.error?.message ||
-            'Unable to verify this visit link.'
-        );
-      }
+      const data = res.data;
 
-      const data = response.data;
+      this._campaignName.set(data.campaignName);
+      this._taskTitle.set(data.taskTitle);
+      this._rewardAmount.set(data.rewardAmount);
 
-      /**
-       * Campaign information.
-       */
-      this._campaignName.set(
-        data.campaignName ?? ''
-      );
-
-      this._taskTitle.set(
-        data.taskTitle ?? ''
-      );
-
-      this._rewardAmount.set(
-        data.rewardAmount ?? null
-      );
-
-      /**
-       * Already completed.
-       */
       if (data.alreadyCompleted) {
-        this.writeClaim(
-          token,
-          {
-            campaignName:
-              data.campaignName ?? '',
-
-            taskTitle:
-              data.taskTitle ?? '',
-
-            rewardAmount:
-              data.rewardAmount ?? null,
-          }
-        );
-
-        this.stopTimer();
-
+        this.writeClaim(this.token as string, {
+          campaignName: data.campaignName,
+          taskTitle: data.taskTitle,
+          rewardAmount: data.rewardAmount,
+        });
         this._status.set('claimed');
-
         return;
       }
 
-      /**
-       * Expired.
-       */
       if (data.expired) {
         this._errorMessage.set(
-          'This reward link has expired. Start the task again in the Earnivo app.'
+          'This reward link has expired. Start the task again in the Earnivo app.',
         );
-
-        this.stopTimer();
-
         this._status.set('error');
-
         return;
       }
 
-      /**
-       * Required seconds.
-       */
-      const requiredSeconds =
-        Math.max(
-          0,
-          Number(
-            data.requiredSeconds ?? 0
-          )
-        );
+      this._requiredSeconds.set(data.requiredSeconds);
+      const remaining = Math.max(0, data.remainingSeconds ?? data.requiredSeconds ?? 0);
+      this._remainingSeconds.set(remaining);
 
-      /**
-       * Remaining seconds.
-       */
-      const remainingSeconds =
-        Math.max(
-          0,
-          Number(
-            data.remainingSeconds ??
-              requiredSeconds
-          )
-        );
-
-      this._requiredSeconds.set(
-        requiredSeconds
-      );
-
-      this._remainingSeconds.set(
-        remainingSeconds
-      );
-
-      /**
-       * Timer already completed.
-       */
-      if (remainingSeconds <= 0) {
-        this.stopTimer();
-
+      if (remaining <= 0) {
         this._status.set('ready');
-
-        return;
+      } else {
+        this._status.set('waiting');
+        this.evaluateTimer();
       }
-
-      /**
-       * Start waiting.
-       */
-      this._status.set('waiting');
-
-      this.evaluateTimer();
-    } catch (error) {
-      /**
-       * Ignore old request errors.
-       */
-      if (this.token !== token) {
-        return;
-      }
-
-      console.error(
-        '[Earnivo] Session error:',
-        error
-      );
-
-      this._errorMessage.set(
-        this.extractMessage(
-          error,
-          'Unable to verify this visit link.'
-        )
-      );
-
-      this.stopTimer();
-
+    } catch (err) {
+      this._errorMessage.set(this.extractMessage(err, 'Unable to verify this visit link.'));
       this._status.set('error');
     }
   }
 
-  /**
-   * Get token from URL or sessionStorage.
-   *
-   * URL token always has priority.
-   */
-  private getTokenFromUrlOrStorage():
-    string | null {
-    if (
-      typeof window === 'undefined'
-    ) {
-      return null;
+  private resolveToken(): string | null {
+    const url = new URL(window.location.href);
+    const fromUrl = url.searchParams.get(TOKEN_PARAM);
+
+    if (fromUrl) {
+      // One-time credential for this visit — belongs in sessionStorage, not localStorage.
+      sessionStorage.setItem(TOKEN_STORAGE_KEY, fromUrl);
+      url.searchParams.delete(TOKEN_PARAM);
+      window.history.replaceState(history.state, '', url.toString());
+      return fromUrl;
     }
 
+    return sessionStorage.getItem(TOKEN_STORAGE_KEY);
+  }
+
+  private readClaim(token: string): StoredClaim | null {
     try {
-      const url = new URL(
-        window.location.href
-      );
-
-      const urlToken =
-        url.searchParams.get(
-          TOKEN_PARAM
-        );
-
-      console.log(
-        '[Earnivo] URL:',
-        window.location.href
-      );
-
-      console.log(
-        '[Earnivo] URL token:',
-        urlToken
-      );
-
-      if (urlToken?.trim()) {
-        return this.normalizeToken(
-          urlToken
-        );
-      }
-
-      const storedToken =
-        sessionStorage.getItem(
-          TOKEN_STORAGE_KEY
-        );
-
-      console.log(
-        '[Earnivo] Stored token:',
-        storedToken
-      );
-
-      return this.normalizeToken(
-        storedToken
-      );
-    } catch (error) {
-      console.error(
-        '[Earnivo] Token read error:',
-        error
-      );
-
-      return null;
-    }
-  }
-
-  /**
-   * Normalize token.
-   */
-  private normalizeToken(
-    token:
-      | string
-      | null
-      | undefined
-  ): string | null {
-    if (!token) {
-      return null;
-    }
-
-    const normalized =
-      token.trim();
-
-    return normalized.length > 0
-      ? normalized
-      : null;
-  }
-
-  /**
-   * Remove ev_token from URL.
-   */
-  private removeTokenFromUrl(): void {
-    if (
-      typeof window === 'undefined'
-    ) {
-      return;
-    }
-
-    try {
-      const url = new URL(
-        window.location.href
-      );
-
-      if (
-        !url.searchParams.has(
-          TOKEN_PARAM
-        )
-      ) {
-        return;
-      }
-
-      url.searchParams.delete(
-        TOKEN_PARAM
-      );
-
-      window.history.replaceState(
-        window.history.state,
-        '',
-        url.toString()
-      );
-    } catch (error) {
-      console.warn(
-        '[Earnivo] Could not remove token from URL:',
-        error
-      );
-    }
-  }
-
-  /**
-   * Reset complete state.
-   */
-  private reset(): void {
-    this.stopTimer();
-
-    this.token = null;
-
-    this._status.set('inactive');
-    this._campaignName.set('');
-    this._taskTitle.set('');
-    this._rewardAmount.set(null);
-    this._requiredSeconds.set(0);
-    this._remainingSeconds.set(0);
-    this._errorMessage.set('');
-    this._lastClaimError.set(null);
-  }
-
-  /**
-   * Reset current campaign state.
-   */
-  private resetSessionState(): void {
-    this.stopTimer();
-
-    this._status.set('inactive');
-    this._campaignName.set('');
-    this._taskTitle.set('');
-    this._rewardAmount.set(null);
-    this._requiredSeconds.set(0);
-    this._remainingSeconds.set(0);
-    this._errorMessage.set('');
-    this._lastClaimError.set(null);
-  }
-
-  /**
-   * Read cached claim.
-   */
-  private readClaim(
-    token: string
-  ): StoredClaim | null {
-    try {
-      const raw =
-        sessionStorage.getItem(
-          CLAIM_STORAGE_PREFIX +
-            token
-        );
-
-      if (!raw) {
-        return null;
-      }
-
-      return JSON.parse(
-        raw
-      ) as StoredClaim;
+      const raw = sessionStorage.getItem(CLAIM_STORAGE_PREFIX + token);
+      return raw ? (JSON.parse(raw) as StoredClaim) : null;
     } catch {
       return null;
     }
   }
 
-  /**
-   * Save completed claim.
-   */
-  private writeClaim(
-    token: string,
-    claim: StoredClaim
-  ): void {
-    try {
-      sessionStorage.setItem(
-        CLAIM_STORAGE_PREFIX +
-          token,
-        JSON.stringify(claim)
-      );
-    } catch (error) {
-      console.warn(
-        '[Earnivo] Could not save claim:',
-        error
-      );
-    }
+  private writeClaim(token: string, claim: StoredClaim): void {
+    sessionStorage.setItem(CLAIM_STORAGE_PREFIX + token, JSON.stringify(claim));
   }
 
-  /**
-   * Check whether page is visible.
-   */
   private isPageActive(): boolean {
     return (
       typeof document !== 'undefined' &&
-      document.visibilityState ===
-        'visible'
+      document.visibilityState === 'visible' &&
+      document.hasFocus()
     );
   }
 
-  /**
-   * Bind visibility listeners.
-   */
   private bindVisibilityListeners(): void {
-    if (
-      this.listenersBound ||
-      typeof document === 'undefined' ||
-      typeof window === 'undefined'
-    ) {
+    if (this.listenersBound) {
       return;
     }
-
     this.listenersBound = true;
 
-    const handleActivityChange =
-      (): void => {
-        this._pageActive.set(
-          this.isPageActive()
-        );
+    const handleActivityChange = () => {
+      this._pageActive.set(this.isPageActive());
+      this.evaluateTimer();
+    };
 
-        this.evaluateTimer();
-      };
-
-    document.addEventListener(
-      'visibilitychange',
-      handleActivityChange
-    );
-
-    window.addEventListener(
-      'focus',
-      handleActivityChange
-    );
-
-    window.addEventListener(
-      'blur',
-      handleActivityChange
-    );
+    document.addEventListener('visibilitychange', handleActivityChange);
+    window.addEventListener('focus', handleActivityChange);
+    window.addEventListener('blur', handleActivityChange);
   }
 
-  /**
-   * Start/stop countdown.
-   */
+  /** Starts or stops the interval to match current status + tab activity, never touching remainingSeconds itself. */
   private evaluateTimer(): void {
-    const shouldRun =
-      this._status() === 'waiting' &&
-      this._pageActive();
+    const shouldRun = this._status() === 'waiting' && this.isPageActive();
 
-    if (
-      shouldRun &&
-      this.intervalId === null
-    ) {
-      this.intervalId =
-        setInterval(
-          () => this.tick(),
-          1000
-        );
-
-      return;
-    }
-
-    if (
-      !shouldRun &&
-      this.intervalId !== null
-    ) {
+    if (shouldRun && this.intervalId === null) {
+      this.intervalId = setInterval(() => this.tick(), 1000);
+    } else if (!shouldRun && this.intervalId !== null) {
       this.stopTimer();
     }
   }
 
-  /**
-   * Countdown tick.
-   */
-  private tick(): void {
-    if (
-      this._status() !== 'waiting'
-    ) {
-      this.stopTimer();
-
-      return;
-    }
-
-    const current =
-      this._remainingSeconds();
-
-    const next =
-      Math.max(
-        0,
-        current - 1
-      );
-
-    this._remainingSeconds.set(
-      next
-    );
-
-    if (next <= 0) {
-      this.stopTimer();
-
-      this._status.set('ready');
-    }
-  }
-
-  /**
-   * Stop countdown.
-   */
   private stopTimer(): void {
-    if (
-      this.intervalId !== null
-    ) {
-      clearInterval(
-        this.intervalId
-      );
-
+    if (this.intervalId !== null) {
+      clearInterval(this.intervalId);
       this.intervalId = null;
     }
   }
 
-  /**
-   * Extract API error.
-   */
-  private extractMessage(
-    error: unknown,
-    fallback: string
-  ): string {
-    if (
-      error instanceof
-      HttpErrorResponse
-    ) {
-      const body =
-        error.error as
-          | EarnivoApiEnvelope<unknown>
-          | null
-          | undefined;
+  private tick(): void {
+    const next = this._remainingSeconds() - 1;
 
-      return (
-        body?.error?.message ||
-        error.message ||
-        fallback
-      );
+    if (next <= 0) {
+      this._remainingSeconds.set(0);
+      this.stopTimer();
+      this._status.set('ready');
+      return;
     }
 
-    if (
-      error instanceof Error &&
-      error.message
-    ) {
-      return error.message;
-    }
+    this._remainingSeconds.set(next);
+  }
 
+  private extractMessage(err: unknown, fallback: string): string {
+    if (err instanceof HttpErrorResponse) {
+      const body = err.error as EarnivoApiEnvelope<unknown> | null;
+      return body?.error?.message || fallback;
+    }
+    if (err instanceof Error && err.message) {
+      return err.message;
+    }
     return fallback;
   }
 }
