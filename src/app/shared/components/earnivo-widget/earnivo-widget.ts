@@ -21,6 +21,10 @@ export class EarnivoWidget implements OnInit {
     return `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, '0')}s`;
   });
 
+  protected readonly showCloseButton = computed(
+    () => this.earnivo.isTimerCompleted() || this.earnivo.status() === 'error',
+  );
+
   ngOnInit(): void {
     this.initializeEarnivo();
     this.watchOtherFixedBottomUi();

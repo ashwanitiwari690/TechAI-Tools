@@ -1,13 +1,15 @@
 @if (earnivo.status() !== 'inactive') {
   <aside class="earnivo-card" role="status" aria-live="polite" [style.bottom.px]="bottomOffset()">
-    <button
-      type="button"
-      class="earnivo-card__close"
-      aria-label="Hide reward panel"
-      (click)="earnivo.dismiss()"
-    >
-      &times;
-    </button>
+    @if (showCloseButton()) {
+      <button
+        type="button"
+        class="earnivo-card__close"
+        aria-label="Hide reward panel"
+        (click)="earnivo.dismiss()"
+      >
+        &times;
+      </button>
+    }
 
     <div class="earnivo-card__head">
       <span class="earnivo-card__badge" aria-hidden="true">

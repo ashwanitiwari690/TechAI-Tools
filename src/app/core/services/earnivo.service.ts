@@ -73,6 +73,15 @@ export class EarnivoService {
     () => this._status() === 'waiting' && !this._pageActive(),
   );
 
+  readonly isTimerCompleted = computed(() => {
+    const status = this._status();
+    return (
+      status === 'ready' ||
+      status === 'claiming' ||
+      status === 'claimed'
+    );
+  });
+
   readonly progressPercent = computed(() => {
     const required = this._requiredSeconds();
 
